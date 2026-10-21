@@ -1,0 +1,11 @@
+{
+  "name": "fitness-app-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n \"DB_GUI,BACKEND,FRONTEND\" -c \"magenta,blue,green\" \"launch-db.bat\" \"node --watch fitness-ai-backend/server.js\" \"npm run dev --prefix fitness-ai-frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
