@@ -64,43 +64,75 @@ Mối quan hệ tương tác giữa bốn tác nhân chính và các nhóm ca s�
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[scale=0.92, every node/.style={transform shape}]
-    % Khung hệ thống
-    \draw[thick, draw=academicblue, fill=codebg, rounded corners=6pt] (3.0, 0.2) rectangle (11.2, 8.8);
-    \node[font=\bfseries\small, text=academicblue] at (7.1, 8.35) {HỆ THỐNG QUẢN LÝ LỊCH TẬP GYM VÀ TRỢ LÝ AI};
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}
+    % Khung ranh giới hệ thống (System Boundary)
+    \draw[thick, draw=academicblue, fill=codebg, rounded corners=8pt] (3.6, -0.2) rectangle (15.4, 10.8);
+    \node[fill=academicblue, text=white, font=\bfseries\small, rounded corners=4pt, inner sep=6pt, minimum width=11.2cm] at (9.5, 10.3) {HỆ THỐNG QUẢN LÝ LỊCH TẬP GYM VÀ TRỢ LÝ AI};
 
-    % Các tác nhân bên trái
-    \node[draw=academicblue, thick, fill=white, rounded corners=4pt, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\bfseries\footnotesize] (member) at (0.8, 6.6) {Member};
-    \node[draw=academicblue, thick, fill=white, rounded corners=4pt, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\bfseries\footnotesize] (pt) at (0.8, 2.4) {PT};
+    % Định nghĩa kiểu nút
+    \tikzset{
+        actor/.style={
+            draw=academicblue,
+            line width=1.1pt,
+            fill=white,
+            rounded corners=6pt,
+            minimum width=2.8cm,
+            minimum height=1.2cm,
+            align=center,
+            font=\small,
+            drop shadow={opacity=0.12, shadow xshift=1.2pt, shadow yshift=-1.2pt}
+        },
+        usecase/.style={
+            draw=academicblue,
+            line width=0.9pt,
+            fill=white,
+            rounded corners=13pt,
+            text width=8.8cm,
+            minimum height=1.05cm,
+            align=center,
+            font=\small,
+            inner sep=4pt,
+            drop shadow={opacity=0.08, shadow xshift=1pt, shadow yshift=-1pt}
+        }
+    }
 
-    % Các tác nhân bên phải
-    \node[draw=academicblue, thick, fill=white, rounded corners=4pt, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\bfseries\footnotesize] (aicoach) at (13.4, 6.6) {AI Coach};
-    \node[draw=academicblue, thick, fill=white, rounded corners=4pt, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\bfseries\footnotesize] (admin) at (13.4, 2.4) {Admin};
+    % Tác nhân bên trái (MEMBER & PT)
+    \node[actor] (member) at (1.6, 7.2) {\textbf{MEMBER} \\[2pt] \scriptsize Hội viên tập luyện};
+    \node[actor] (pt) at (1.6, 2.4) {\textbf{PT} \\[2pt] \scriptsize Huấn luyện viên cá nhân};
 
-    % Các ca sử dụng bên trong hệ thống
-    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc1) at (7.1, 7.4) {UC01: Khảo sát Onboarding và tính BMR, TDEE, Macros};
-    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc2) at (7.1, 6.2) {UC02: Sinh giáo án bốn pha an toàn chấn thương và tập trực tiếp};
-    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc3) at (7.1, 5.0) {UC03: Quét ảnh món ăn Việt và tư vấn qua trợ lý RAG Chat};
-    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc4) at (7.1, 3.8) {UC04: Mua gói buổi tập, đặt lịch 60 phút và điểm danh mã QR};
-    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc5) at (7.1, 2.4) {UC05: Thẩm định, phê duyệt hoặc ghi đè giáo án và quản lý ca dạy};
-    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc6) at (7.1, 1.0) {UC06: Quản trị người dùng, danh mục bài tập, gói tập và doanh thu};
+    % Tác nhân bên phải (AI COACH & ADMIN)
+    \node[actor] (aicoach) at (17.4, 7.2) {\textbf{AI COACH} \\[2pt] \scriptsize Trợ lý thông minh};
+    \node[actor] (admin) at (17.4, 2.4) {\textbf{ADMIN} \\[2pt] \scriptsize Quản trị hệ thống};
 
-    % Đường kết nối
-    \draw[thick, draw=academicblue] (member.east) -- (uc1.west);
-    \draw[thick, draw=academicblue] (member.east) -- (uc2.west);
-    \draw[thick, draw=academicblue] (member.east) -- (uc3.west);
-    \draw[thick, draw=academicblue] (member.east) -- (uc4.west);
+    % Các ca sử dụng cốt lõi (Use Cases UC01 -> UC06)
+    \node[usecase] (uc1) at (9.5, 8.8) {\textbf{UC01: Khảo sát thể trạng Onboarding} \\ \scriptsize Tính chỉ số BMR, TDEE và phân bổ nhu cầu dinh dưỡng};
+    \node[usecase] (uc2) at (9.5, 7.2) {\textbf{UC02: Sinh giáo án 4 pha \& Hướng dẫn tập} \\ \scriptsize Lọc an toàn chấn thương và thanh phát âm giọng nói};
+    \node[usecase] (uc3) at (9.5, 5.6) {\textbf{UC03: Quét ảnh món ăn \& Hỏi đáp RAG Chat} \\ \scriptsize Nhận diện món Việt, tính calo và tra cứu kỹ thuật bài tập};
+    \node[usecase] (uc4) at (9.5, 4.0) {\textbf{UC04: Mua gói tập \& Đặt lịch ca 60 phút} \\ \scriptsize Khoảng nghỉ đệm 15 phút và điểm danh bằng mã QR};
+    \node[usecase] (uc5) at (9.5, 2.4) {\textbf{UC05: Thẩm định \& Phê duyệt giáo án} \\ \scriptsize PT xem xét tiền sử chấn thương và duyệt bài tập};
+    \node[usecase] (uc6) at (9.5, 0.8) {\textbf{UC06: Quản trị danh mục \& Vận hành} \\ \scriptsize Quản trị tài khoản, danh mục bài tập và gói dịch vụ};
 
-    \draw[thick, draw=academicblue] (aicoach.west) -- (uc1.east);
+    % Đường liên kết phân rã từ tác nhân Member
+    \draw[thick, draw=academicblue] ([yshift=12pt]member.east) -- (uc1.west);
+    \draw[thick, draw=academicblue] ([yshift=4pt]member.east) -- (uc2.west);
+    \draw[thick, draw=academicblue] ([yshift=-4pt]member.east) -- (uc3.west);
+    \draw[thick, draw=academicblue] ([yshift=-12pt]member.east) -- (uc4.west);
+
+    % Đường liên kết phân rã từ tác nhân AI Coach
+    \draw[thick, draw=academicblue] ([yshift=10pt]aicoach.west) -- (uc1.east);
     \draw[thick, draw=academicblue] (aicoach.west) -- (uc2.east);
-    \draw[thick, draw=academicblue] (aicoach.west) -- (uc3.east);
+    \draw[thick, draw=academicblue] ([yshift=-10pt]aicoach.west) -- (uc3.east);
 
-    \draw[thick, draw=academicblue] (pt.east) -- (uc4.west);
-    \draw[thick, draw=academicblue] (pt.east) -- (uc5.west);
+    % Đường liên kết phân rã từ tác nhân PT
+    \draw[thick, draw=academicblue] ([yshift=6pt]pt.east) -- (uc4.west);
+    \draw[thick, draw=academicblue] ([yshift=-6pt]pt.east) -- (uc5.west);
 
-    \draw[thick, draw=academicblue] (admin.west) -- (uc4.east);
-    \draw[thick, draw=academicblue] (admin.west) -- (uc6.east);
+    % Đường liên kết phân rã từ tác nhân Admin
+    \draw[thick, draw=academicblue] ([yshift=6pt]admin.west) -- (uc4.east);
+    \draw[thick, draw=academicblue] ([yshift=-6pt]admin.west) -- (uc6.east);
 \end{tikzpicture}
+}
 \caption{Sơ đồ Use Case tổng quát phân rã theo bốn tác nhân của hệ thống}
 \label{fig:usecase_diagram}
 \end{figure}
