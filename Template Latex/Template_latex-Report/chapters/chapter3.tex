@@ -1,0 +1,379 @@
+% ==============================================================================
+% CHƯƠNG 3: PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG
+% ==============================================================================
+
+\chapter{PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG}
+\label{chap:thietke}
+
+\section{Phân tích yêu cầu bài toán}
+\label{sec:yeucau}
+
+\subsection{Xác định tác nhân và ma trận phân quyền RBAC}
+\label{subsec:rbac}
+
+Hệ thống được thiết kế để vận hành cho mô hình phòng tập thể hình kết hợp hỗ trợ rèn luyện tại nhà, bao gồm bốn nhóm tác nhân tương tác chặt chẽ với nhau: Member, PT, AI Coach và Admin. Để đảm bảo an toàn y học thể thao, kiến trúc nghiệp vụ thiết lập nguyên tắc phân quyền cốt lõi là quyết định chuyên môn của PT luôn có độ ưu tiên cao hơn AI Coach.
+
+Ở giai đoạn khởi đầu khi người dùng mới đăng ký tài khoản và chưa mua gói dịch vụ có huấn luyện viên kèm cặp, AI Coach được phép tạo giáo án mẫu gồm các bài tập cơ bản dựa trên chỉ số cơ thể. Tuy nhiên, ngay khi người dùng đăng ký gói dịch vụ có PT, mọi giáo án do máy tính đề xuất đều mang trạng thái chờ thẩm định và bắt buộc phải được PT phụ trách phê duyệt trước khi áp dụng. AI Coach chỉ được phép tự động tính toán và điều chỉnh lượng calo khuyến nghị theo biến động cân nặng, hoàn toàn không có quyền tự ý sửa đổi danh sách bài tập đã được PT khóa duyệt. Chi tiết phạm vi quyền hạn của từng tác nhân được quy định tại \cref{tab:rbac}.
+
+\begin{table}[htbp]
+\centering
+\caption{Ma trận phân quyền RBAC và phạm vi tác vụ của các tác nhân}
+\label{tab:rbac}
+\begin{tabularx}{\textwidth}{l >{\raggedright\arraybackslash}p{3.4cm} >{\raggedright\arraybackslash}X}
+    \toprule
+    \textbf{Tác nhân} & \textbf{Vai trò hệ thống} & \textbf{Quyền hạn và ràng buộc nghiệp vụ cốt lõi} \\
+    \midrule
+    \textbf{Member} & Hội viên tập luyện & Thực hiện khảo sát thể trạng, nhận lộ trình mẫu, quét ảnh món ăn, mua gói buổi tập, đặt lịch hẹn, điểm danh bằng mã QR và yêu cầu đổi người hướng dẫn khi cần. \\
+    \textbf{AI Coach} & Trợ lý huấn luyện ảo & Tính chỉ số BMR, TDEE, phân bổ Macronutrients, sinh giáo án bốn pha an toàn chấn thương, nhận diện thực phẩm qua ảnh; không được phép ghi đè giáo án đã được PT phê duyệt. \\
+    \textbf{PT} & Huấn luyện viên cá nhân & Xem toàn bộ hồ sơ thể trạng, nhật ký dinh dưỡng và lịch sử suy luận của AI Coach; phê duyệt, chỉnh sửa hoặc ghi đè giáo án tập luyện; quản lý lịch dạy và xác nhận hoàn thành buổi tập. \\
+    \textbf{Admin} & Quản trị viên phòng tập & Quản lý tài khoản người dùng, hồ sơ PT, thư viện bài tập cơ sinh học, danh mục gói dịch vụ, đối soát giao dịch thanh toán và giám sát số liệu vận hành toàn hệ thống. \\
+    \bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Yêu cầu chức năng}
+\label{subsec:yeucau_chucnang}
+
+Dựa trên ma trận phân quyền, hệ thống bao gồm năm phân hệ chức năng chính:
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Phân hệ xác thực và khảo sát thể trạng linh hoạt:} Hỗ trợ đăng ký, đăng nhập bảo mật bằng JWT. Quy trình Onboarding cho phép hội viên điền các thông số cốt lõi gồm chiều cao, cân nặng, độ tuổi, giới tính, tiền sử chấn thương, thiết bị sẵn có và một mục tiêu duy nhất tại mỗi thời điểm, hoặc tạm thời bỏ qua để khám phá giao diện trước khi cập nhật sau.
+    \item \textbf{Phân hệ thiết kế lịch tập và hướng dẫn trực tiếp:} Cho phép sinh tự động chương trình tập luyện bốn pha gồm từ 4 đến 6 bài tập mỗi buổi, hỗ trợ đổi bài tập tương đương cùng nhóm cơ khi thiết bị bận, đồng thời tích hợp thanh phát âm giọng nói hướng dẫn nhịp độ thực hiện và đếm ngược thời gian nghỉ giữa các hiệp.
+    \item \textbf{Phân hệ dinh dưỡng và thị giác thực phẩm:} Tự động tính toán mục tiêu năng lượng hàng ngày, theo dõi nhật ký bữa ăn, tích hợp công cụ quét ảnh món ăn để phân loại ảnh đầu vào, bóc tách thành phần món Việt theo đơn vị gram và truy vấn trợ lý RAG Chat.
+    \item \textbf{Phân hệ gói dịch vụ, phân bổ PT và đặt lịch hẹn:} Quản lý các gói tập bán theo số buổi, yêu cầu khảo sát trải nghiệm trước khi gia hạn gói mới. Khi thanh toán thành công, hệ thống tự động phân bổ PT đang có tải công việc phù hợp. Chức năng đặt lịch áp dụng khung giờ chuẩn 60 phút mỗi buổi kèm 15 phút nghỉ đệm bắt buộc giữa hai ca liên tiếp, hỗ trợ hủy lịch miễn phí trước 12 giờ và điểm danh tại phòng tập bằng mã QR.
+    \item \textbf{Phân hệ không gian làm việc của PT và trang quản trị Admin:} Cung cấp bảng điều khiển chuyên biệt để PT duyệt giáo án, theo dõi tiến độ học viên, đánh dấu trạng thái vắng mặt nếu quá 15 phút không điểm danh, cùng giao diện để Admin quản trị toàn bộ dữ liệu danh mục.
+\end{enumerate}
+
+\subsection{Yêu cầu phi chức năng}
+\label{subsec:yeucau_phichucnang}
+
+Bên cạnh các chức năng nghiệp vụ, hệ thống phải thỏa mãn các yêu cầu phi chức năng khắt khe về hiệu năng, độ tin cậy và an toàn:
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Hiệu năng và độ trễ phản hồi:} Các truy vấn nghiệp vụ thông thường và tra cứu bài tập qua bộ nhớ đệm trong RAM cần đạt thời gian phản hồi dưới $200\text{ ms}$. Đối với các tác vụ suy luận ngôn ngữ và phân tích hình ảnh, hệ thống duy trì thời gian phản hồi trung bình từ $1.5\text{ s}$ đến $4.0\text{ s}$ nhờ cơ chế kết hợp mô hình cục bộ và đám mây.
+    \item \textbf{Độ an toàn y học thể thao:} Tuyệt đối không đề xuất mức năng lượng mục tiêu thấp hơn $1200\text{ kcal/ngày}$ và phải loại trừ $100\%$ các bài tập nằm trong danh sách chống chỉ định đối với vùng khớp mà người dùng khai báo chấn thương.
+    \item \textbf{Tính sẵn sàng và chịu lỗi:} Khi máy chủ Ollama cục bộ chưa khởi động hoặc dịch vụ đám mây hết hạn mức truy cập, tầng dịch vụ phải tự động kích hoạt nhánh xử lý dự phòng để luồng trải nghiệm của người dùng không bị gián đoạn.
+    \item \textbf{Bảo mật và khả năng tương thích:} Mật khẩu người dùng được băm bằng thuật toán \texttt{bcrypt}; mọi điểm cuối API nhạy cảm đều được bảo vệ bởi tầng trung gian kiểm tra chữ ký JWT và vai trò người dùng. Giao diện tương thích hoàn toàn trên cả màn hình máy tính để bàn và thiết bị di động cầm tay tại phòng tập.
+\end{itemize}
+
+\section{Phân tích nghiệp vụ và thiết kế Use Case}
+\label{sec:usecase}
+
+\subsection{Sơ đồ phân rã chức năng theo tác nhân}
+\label{subsec:usecase_tongquat}
+
+Mối quan hệ tương tác giữa bốn tác nhân chính và các nhóm ca sử dụng cốt lõi trong hệ thống được mô hình hóa trực quan tại \cref{fig:usecase_diagram}.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.92, every node/.style={transform shape}]
+    % Khung hệ thống
+    \draw[thick, draw=academicblue, fill=codebg, rounded corners=6pt] (3.0, 0.2) rectangle (11.2, 8.8);
+    \node[font=\bfseries\small, text=academicblue] at (7.1, 8.35) {HỆ THỐNG QUẢN LÝ LỊCH TẬP GYM VÀ TRỢ LÝ AI};
+
+    % Các tác nhân bên trái
+    \node[draw=academicblue, thick, fill=white, rounded corners=4pt, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\bfseries\footnotesize] (member) at (0.8, 6.6) {Member};
+    \node[draw=academicblue, thick, fill=white, rounded corners=4pt, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\bfseries\footnotesize] (pt) at (0.8, 2.4) {PT};
+
+    % Các tác nhân bên phải
+    \node[draw=academicblue, thick, fill=white, rounded corners=4pt, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\bfseries\footnotesize] (aicoach) at (13.4, 6.6) {AI Coach};
+    \node[draw=academicblue, thick, fill=white, rounded corners=4pt, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\bfseries\footnotesize] (admin) at (13.4, 2.4) {Admin};
+
+    % Các ca sử dụng bên trong hệ thống
+    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc1) at (7.1, 7.4) {UC01: Khảo sát Onboarding và tính BMR, TDEE, Macros};
+    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc2) at (7.1, 6.2) {UC02: Sinh giáo án bốn pha an toàn chấn thương và tập trực tiếp};
+    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc3) at (7.1, 5.0) {UC03: Quét ảnh món ăn Việt và tư vấn qua trợ lý RAG Chat};
+    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc4) at (7.1, 3.8) {UC04: Mua gói buổi tập, đặt lịch 60 phút và điểm danh mã QR};
+    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc5) at (7.1, 2.4) {UC05: Thẩm định, phê duyệt hoặc ghi đè giáo án và quản lý ca dạy};
+    \node[draw=academicblue, fill=white, rounded corners=10pt, minimum width=6.8cm, minimum height=0.75cm, align=center, font=\footnotesize] (uc6) at (7.1, 1.0) {UC06: Quản trị người dùng, danh mục bài tập, gói tập và doanh thu};
+
+    % Đường kết nối
+    \draw[thick, draw=academicblue] (member.east) -- (uc1.west);
+    \draw[thick, draw=academicblue] (member.east) -- (uc2.west);
+    \draw[thick, draw=academicblue] (member.east) -- (uc3.west);
+    \draw[thick, draw=academicblue] (member.east) -- (uc4.west);
+
+    \draw[thick, draw=academicblue] (aicoach.west) -- (uc1.east);
+    \draw[thick, draw=academicblue] (aicoach.west) -- (uc2.east);
+    \draw[thick, draw=academicblue] (aicoach.west) -- (uc3.east);
+
+    \draw[thick, draw=academicblue] (pt.east) -- (uc4.west);
+    \draw[thick, draw=academicblue] (pt.east) -- (uc5.west);
+
+    \draw[thick, draw=academicblue] (admin.west) -- (uc4.east);
+    \draw[thick, draw=academicblue] (admin.west) -- (uc6.east);
+\end{tikzpicture}
+\caption{Sơ đồ Use Case tổng quát phân rã theo bốn tác nhân của hệ thống}
+\label{fig:usecase_diagram}
+\end{figure}
+
+\subsection{Đặc tả các luồng nghiệp vụ trọng tâm}
+\label{subsec:luong_nghiepvu}
+
+Hai luồng nghiệp vụ quan trọng nhất quyết định tính chặt chẽ của toàn bộ hệ thống là quy trình phối hợp phê duyệt giáo án và quy trình đặt lịch tập luyện có kiểm soát xung đột:
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Luồng khởi tạo và phê duyệt giáo án:} Sau khi hội viên hoàn tất biểu mẫu khảo sát thể trạng hoặc chọn nhóm cơ mục tiêu trong ngày, hệ thống kích hoạt bộ lọc bài tập cơ sinh học kết hợp mô hình ngôn ngữ để sinh giáo án bốn pha. Nếu hội viên đang sử dụng gói dịch vụ có PT, bản ghi giáo án được gắn cờ trạng thái chờ duyệt và gửi thông báo tới không gian làm việc của PT phụ trách. Tại đây, PT xem xét tiền sử chấn thương cùng lý do gợi ý của máy tính, thực hiện điều chỉnh số hiệp, mức tạ hoặc thay thế bài tập nếu cần, sau đó bấm xác nhận phê duyệt. Khi đã được PT duyệt, giáo án được khóa quyền chỉnh sửa tự động của AI Coach để hội viên bắt đầu tập luyện an toàn.
+    \item \textbf{Luồng đặt lịch hẹn và kiểm soát điểm danh:} Khi hội viên còn số buổi tập khả dụng trong gói dịch vụ, người dùng chọn ngày và khung giờ rảnh của PT được phân bổ. Hệ thống tự động kiểm tra hai điều kiện ràng buộc: mỗi ca tập kéo dài đúng 60 phút và phải cách ca liền kề của cùng PT tối thiểu 15 phút nghỉ đệm. Khi đặt lịch thành công, hệ thống tạm giữ 1 buổi tập và sinh mã định danh QR duy nhất cho ca hẹn. Hội viên được phép hủy lịch miễn phí nếu thao tác trước giờ hẹn tối thiểu 12 giờ; nếu hủy muộn hơn hoặc vắng mặt quá 15 phút kể từ thời điểm bắt đầu ca tập mà không quét mã QR, PT có quyền đánh dấu vắng mặt và buổi tập đó vẫn bị trừ khỏi số dư gói dịch vụ.
+\end{enumerate}
+
+\section{Thiết kế kiến trúc tổng thể và các Pipeline AI}
+\label{sec:kientruc_hethong}
+
+\subsection{Kiến trúc tổng thể hệ thống}
+\label{subsec:kientruc_tongthe}
+
+Hệ thống được thiết kế theo kiến trúc phân tầng mô-đun hóa, tách biệt rõ ràng giữa tầng giao diện người dùng, tầng điều phối dịch vụ ứng dụng, tầng lưu trữ dữ liệu quan hệ và tầng suy luận trí tuệ nhân tạo lai như minh họa trong \cref{fig:system_arch}.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}
+    % Tầng 1: Client (x từ 0 đến 18.8)
+    \draw[thick, draw=academicblue, fill=codebg, rounded corners=6pt] (0, 6.2) rectangle (18.8, 8.5);
+    \node[font=\bfseries\small, text=academicblue] at (9.4, 8.05) {TẦNG GIAO DIỆN NGƯỜI DÙNG: REACT 19 + VITE + TAILWIND CSS 4};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=4.1cm, minimum height=1.1cm, align=center, font=\footnotesize] at (2.45, 7.0) {\textbf{Member Portal}\\Dashboard \& Studio};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=4.1cm, minimum height=1.1cm, align=center, font=\footnotesize] at (7.08, 7.0) {\textbf{AI Food \& Chat UI}\\Vision Studio \& RAG};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=4.1cm, minimum height=1.1cm, align=center, font=\footnotesize] at (11.72, 7.0) {\textbf{PT Workspace}\\Duyệt giáo án \& QR};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=4.1cm, minimum height=1.1cm, align=center, font=\footnotesize] at (16.35, 7.0) {\textbf{Admin Portal}\\Quản trị \& Thống kê};
+
+    % Tầng 2: Backend API (x từ 0 đến 18.8)
+    \draw[thick, draw=academicblue, fill=codebg, rounded corners=6pt] (0, 3.2) rectangle (18.8, 5.5);
+    \node[font=\bfseries\small, text=academicblue] at (9.4, 5.05) {TẦNG MÁY CHỦ ỨNG DỤNG: NODE.JS + EXPRESS 5 RESTFUL API};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=4.1cm, minimum height=1.1cm, align=center, font=\footnotesize] at (2.45, 4.0) {\textbf{Xác thực \& Bảo mật}\\JWT \& RBAC Guard};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=4.1cm, minimum height=1.1cm, align=center, font=\footnotesize] at (7.08, 4.0) {\textbf{Động cơ thể thao}\\Cơ sinh học \& Macros};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=4.1cm, minimum height=1.1cm, align=center, font=\footnotesize] at (11.72, 4.0) {\textbf{Điều phối AI}\\Vision Gate \& RAG};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=4.1cm, minimum height=1.1cm, align=center, font=\footnotesize] at (16.35, 4.0) {\textbf{Nghiệp vụ phòng tập}\\Booking \& PT Assign};
+
+    % Tầng 3: Data Layer & Hybrid AI Layer
+    \draw[thick, draw=academicblue, fill=codebg, rounded corners=6pt] (0, 0.2) rectangle (9.0, 2.5);
+    \node[font=\bfseries\small, text=academicblue] at (4.5, 2.05) {TẦNG LƯU TRỮ DỮ LIỆU};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=3.9cm, minimum height=1.1cm, align=center, font=\footnotesize] at (2.3, 1.0) {\textbf{PostgreSQL 16}\\19 Bảng quan hệ};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=3.9cm, minimum height=1.1cm, align=center, font=\footnotesize] at (6.7, 1.0) {\textbf{In-Memory Cache}\\Truy xuất 0.5 ms};
+
+    \draw[thick, draw=academicblue, fill=codebg, rounded corners=6pt] (9.8, 0.2) rectangle (18.8, 2.5);
+    \node[font=\bfseries\small, text=academicblue] at (14.3, 2.05) {TẦNG SUY LUẬN HYBRID AI};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=3.9cm, minimum height=1.1cm, align=center, font=\footnotesize] at (12.1, 1.0) {\textbf{Ollama Local}\\Qwen2.5 \& LLaVA};
+    \node[draw=academicblue, fill=white, rounded corners=4pt, minimum width=3.9cm, minimum height=1.1cm, align=center, font=\footnotesize] at (16.5, 1.0) {\textbf{Cloud Gemini API}\\Dự phòng \& Tăng tốc};
+
+    % Mũi tên kết nối giữa các tầng
+    \draw[<->, very thick, draw=academicblue] (9.4, 6.2) -- node[right, font=\footnotesize\bfseries] {HTTP / REST} (9.4, 5.5);
+    \draw[<->, very thick, draw=academicblue] (4.5, 3.2) -- node[left, font=\footnotesize\bfseries] {pg Pool} (4.5, 2.5);
+    \draw[<->, very thick, draw=academicblue] (14.3, 3.2) -- node[right, font=\footnotesize\bfseries] {REST / SDK} (14.3, 2.5);
+\end{tikzpicture}%
+}
+\caption{Sơ đồ kiến trúc tổng thể bốn tầng của hệ thống phần mềm}
+\label{fig:system_arch}
+\end{figure}
+
+\subsection{Thiết kế Pipeline tư vấn giáo án cơ sinh học và trợ lý RAG Chat}
+\label{subsec:pipeline_workout_rag}
+
+Để loại bỏ rủi ro mô hình ngôn ngữ tự suy diễn các bài tập nguy hiểm, luồng sinh giáo án và tư vấn trực tuyến trong các dịch vụ \texttt{aiService.js}, \texttt{llmService.js} và \texttt{ragChatCtrl.js} được thiết kế theo cơ chế kết hợp bốn bước tuần tự:
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{Chuẩn hóa từ đồng nghĩa song ngữ:} Bộ tiền xử lý ánh xạ tên nhóm cơ và thiết bị do người dùng nhập bằng tiếng Việt hoặc tiếng Anh về tập nhãn giải phẫu chuẩn hóa thông qua bảng từ điển \texttt{MUSCLE\_SYNONYMS} và \texttt{expandEquipment}.
+    \item \textbf{Sàng lọc chống chỉ định cơ sinh học:} Hệ thống đối chiếu danh sách chấn thương của hội viên với bộ quy tắc \texttt{INJURY\_RULES} gồm bốn nhóm khớp nhạy cảm là khớp gối, cột sống lưng, khớp vai và cổ tay. Các bài tập có nhãn nằm trong tập \texttt{avoidTagsOrNames} bị loại bỏ hoàn toàn ở tầng truy vấn SQL, đồng thời các biến thể an toàn trong tập \texttt{preferredTagsOrNames} được cộng điểm ưu tiên.
+    \item \textbf{Truy xuất ngữ cảnh tốc độ cao:} Đối với trợ lý RAG Chat, hệ thống duy trì bộ nhớ đệm trong RAM lưu trữ danh mục bài tập chuẩn cơ sinh học và bảng tra cứu nhanh giá trị dinh dưỡng món Việt \texttt{NUTRITION\_FAST\_TRUTH}, cho phép trích xuất ngữ cảnh chỉ trong $0.5\text{ ms}$ mà không gây nghẽn cơ sở dữ liệu.
+    \item \textbf{Tổng hợp giáo án bốn pha có ràng buộc:} Danh sách bài tập an toàn sau khi lọc được đóng gói vào câu lệnh hệ thống để gọi mô hình \texttt{fitness-ai-coach} trên Ollama hoặc Gemini Flash, sinh lời khuyên phân tích góc khớp, nhịp độ Tempo \texttt{3-0-1-0}, kỹ thuật gồng cơ lõi và giải thích lý do lựa chọn từng bài tập.
+\end{enumerate}
+
+\subsection{Thiết kế Pipeline thị giác máy tính quét món ăn}
+\label{subsec:pipeline_vision}
+
+Quy trình nhận diện hình ảnh và ước lượng dinh dưỡng bữa ăn được điều phối qua luồng xử lý đa giai đoạn thể hiện trong \cref{fig:vision_pipeline}.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}
+    % Bước 1: x từ 0.0 đến 4.4
+    \draw[thick, draw=academicblue, fill=white, rounded corners=4pt] (0.0, 0.0) rectangle (4.4, 3.0);
+    \fill[academicblue] (0.0, 2.25) rectangle (4.4, 3.0);
+    \node[font=\bfseries\scriptsize, text=white] at (2.2, 2.62) {1. ĐẦU VÀO ẢNH};
+    \node[font=\scriptsize, align=center] at (2.2, 1.15) {
+        Ảnh chụp bữa ăn\\[3pt]
+        Chuỗi mã hóa Base64\\[3pt]
+        Chuẩn hóa khung hình
+    };
+
+    % Bước 2: x từ 5.2 đến 9.6
+    \draw[thick, draw=academicblue, fill=white, rounded corners=4pt] (5.2, 0.0) rectangle (9.6, 3.0);
+    \fill[academicblue] (5.2, 2.25) rectangle (9.6, 3.0);
+    \node[font=\bfseries\scriptsize, text=white] at (7.4, 2.62) {2. GÁC CỔNG THỊ GIÁC};
+    \node[font=\scriptsize, align=center] at (7.4, 1.15) {
+        Phân loại 3 miền ảnh:\\[2pt]
+        \textbf{FOOD}: Qua bước 3\\[2pt]
+        \textbf{GYM}: Báo thiết bị\\[2pt]
+        \textbf{UNRELATED}: Từ chối
+    };
+
+    % Bước 3: x từ 10.4 đến 14.8
+    \draw[thick, draw=academicblue, fill=white, rounded corners=4pt] (10.4, 0.0) rectangle (14.8, 3.0);
+    \fill[academicblue] (10.4, 2.25) rectangle (14.8, 3.0);
+    \node[font=\bfseries\scriptsize, text=white] at (12.6, 2.62) {3. BÓC TÁCH VLM};
+    \node[font=\scriptsize, align=center] at (12.6, 1.15) {
+        Qwen2-VL LoRA / LLaVA\\[2pt]
+        Nhận diện món ăn Việt\\[2pt]
+        Tách từng nguyên liệu\\[2pt]
+        Ước tính khối lượng gram
+    };
+
+    % Bước 4: x từ 15.6 đến 20.0
+    \draw[thick, draw=academicblue, fill=white, rounded corners=4pt] (15.6, 0.0) rectangle (20.0, 3.0);
+    \fill[academicblue] (15.6, 2.25) rectangle (20.0, 3.0);
+    \node[font=\bfseries\scriptsize, text=white] at (17.8, 2.62) {4. TÍNH DINH DƯỠNG};
+    \node[font=\scriptsize, align=center] at (17.8, 1.15) {
+        Tra cứu CSDL món Việt\\[2pt]
+        Tính Calo và Macros\\[2pt]
+        Lưu nhật ký bữa ăn\\[2pt]
+        Tư vấn qua RAG Chat
+    };
+
+    % Mũi tên kết nối cố định
+    \draw[->, very thick, draw=academicblue] (4.4, 1.5) -- (5.2, 1.5);
+    \draw[->, very thick, draw=academicblue] (9.6, 1.5) -- (10.4, 1.5);
+    \draw[->, very thick, draw=academicblue] (14.8, 1.5) -- (15.6, 1.5);
+\end{tikzpicture}%
+}
+\caption{Sơ đồ luồng xử lý và nhận diện của mô-đun thị giác thực phẩm}
+\label{fig:vision_pipeline}
+\end{figure}
+
+Cụ thể, khi người dùng tải lên một bức ảnh dưới dạng chuỗi mã hóa Base64, bộ điều khiển \texttt{visionFoodScanCtrl.js} và \texttt{smartFoodVisionCtrl.js} thực hiện hai tầng kiểm duyệt nghiêm ngặt:
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{Bộ gác cổng thị giác phân loại miền ảnh:} Ảnh đầu vào được chuyển tới mô hình thị giác cục bộ theo thứ tự ưu tiên từ mô hình đã tinh chỉnh \texttt{fitness-vision-food} đến \texttt{llava} và \texttt{moondream} với nhiệt độ thấp $T = 0.05$. Mô hình thực hiện phân loại bức ảnh vào đúng một trong ba nhãn: \texttt{FOOD} đối với thực phẩm và đồ uống, \texttt{GYM} đối với thiết bị thể hình hoặc tư thế tập luyện, và \texttt{UNRELATED} đối với ảnh chụp màn hình, phong cảnh, phương tiện hoặc vật thể không liên quan. Nếu kết quả thuộc nhãn \texttt{UNRELATED}, hệ thống lập tức dừng luồng tính calo và kích hoạt phản hồi từ chối lịch sự, hướng dẫn hội viên chụp lại ảnh bữa ăn thực tế.
+    \item \textbf{Bóc tách định lượng và đối chiếu dinh dưỡng:} Khi ảnh được xác nhận thuộc nhãn \texttt{FOOD}, mô hình thị giác -- ngôn ngữ tiến hành nhận diện tên món ăn tiếng Việt, phương pháp chế biến như luộc, hấp, nướng hay chiên xào, đồng thời bóc tách danh sách từng thành phần nguyên liệu hiển thị trên đĩa kèm khối lượng ước tính bằng đơn vị gram. Dữ liệu cấu trúc JSON thu được sẽ kết hợp với cơ sở dữ liệu thực phẩm nội bộ để nội suy tổng lượng calo, Protein, Carbohydrate, Fat và đưa ra khuyến nghị điều chỉnh khẩu phần phù hợp với mục tiêu hình thể của người dùng.
+\end{enumerate}
+
+\section{Thiết kế cơ sở dữ liệu}
+\label{sec:thietke_csdl}
+
+\subsection{Sơ đồ liên kết thực thể}
+\label{subsec:erd}
+
+Cơ sở dữ liệu của hệ thống được triển khai trên hệ quản trị PostgreSQL gồm 19 bảng dữ liệu quan hệ, được chia thành năm cụm thực thể liên kết chặt chẽ với nhau qua hệ thống khóa ngoại như trình bày tại \cref{fig:erd}.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}
+    % ================= HÀNG TRÊN (y từ 4.6 đến 7.8) =================
+    % 1. Cụm Bài tập & Giáo án (Trái trên: x từ 0.0 đến 5.8)
+    \draw[thick, draw=academicblue, fill=white, rounded corners=4pt] (0.0, 4.6) rectangle (5.8, 7.8);
+    \fill[academicblue] (0.0, 7.05) rectangle (5.8, 7.8);
+    \node[font=\bfseries\scriptsize, text=white] at (2.9, 7.42) {1. BÀI TẬP \& GIÁO ÁN};
+    \node[font=\scriptsize, align=left, anchor=north west] at (0.35, 6.85) {
+        $\bullet$ \texttt{exercises} --- PK: \texttt{id}\\[3pt]
+        $\bullet$ \texttt{workout\_plans} --- PK: \texttt{id}\\[3pt]
+        $\bullet$ \texttt{plan\_exercises} --- FK: \texttt{plan\_id}\\[3pt]
+        $\bullet$ \texttt{user\_plans} --- FK: \texttt{user\_id}
+    };
+
+    % 2. Cụm Người dùng & Vai trò (Giữa trên - Trung tâm: x từ 7.0 đến 12.8)
+    \draw[very thick, draw=academicblue, fill=codebg, rounded corners=4pt] (7.0, 4.6) rectangle (12.8, 7.8);
+    \fill[academicblue] (7.0, 7.05) rectangle (12.8, 7.8);
+    \node[font=\bfseries\scriptsize, text=white] at (9.9, 7.42) {2. NGƯỜI DÙNG \& VAI TRÒ};
+    \node[font=\scriptsize, align=left, anchor=north west] at (7.35, 6.85) {
+        $\bullet$ \texttt{roles} --- PK: \texttt{id}\\[3pt]
+        $\bullet$ \texttt{users} --- PK: \texttt{id}, FK: \texttt{role\_id}\\[3pt]
+        $\bullet$ \texttt{otp\_codes} --- FK: \texttt{user\_id}\\[3pt]
+        \textit{\color{codegray}Hồ sơ thể trạng và chấn thương}
+    };
+
+    % 3. Cụm Gói tập & Thanh toán (Phải trên: x từ 14.0 đến 19.8)
+    \draw[thick, draw=academicblue, fill=white, rounded corners=4pt] (14.0, 4.6) rectangle (19.8, 7.8);
+    \fill[academicblue] (14.0, 7.05) rectangle (19.8, 7.8);
+    \node[font=\bfseries\scriptsize, text=white] at (16.9, 7.42) {3. GÓI TẬP \& THANH TOÁN};
+    \node[font=\scriptsize, align=left, anchor=north west] at (14.35, 6.85) {
+        $\bullet$ \texttt{packages} --- PK: \texttt{id}\\[3pt]
+        $\bullet$ \texttt{user\_packages} --- FK: \texttt{user\_id}\\[3pt]
+        $\bullet$ \texttt{payments} --- FK: \texttt{user\_id}\\[3pt]
+        \textit{\color{codegray}Quản lý gói buổi tập và gán PT}
+    };
+
+    % ================= HÀNG DƯỚI (y từ 0.0 đến 3.2) =================
+    % 4. Cụm Nhật ký Tiến độ (Trái dưới: x từ 0.0 đến 5.8)
+    \draw[thick, draw=academicblue, fill=white, rounded corners=4pt] (0.0, 0.0) rectangle (5.8, 3.2);
+    \fill[academicblue] (0.0, 2.45) rectangle (5.8, 3.2);
+    \node[font=\bfseries\scriptsize, text=white] at (2.9, 2.82) {4. NHẬT KÝ TIẾN ĐỘ};
+    \node[font=\scriptsize, align=left, anchor=north west] at (0.35, 2.25) {
+        $\bullet$ \texttt{workout\_logs} --- FK: \texttt{user\_id}\\[3pt]
+        $\bullet$ \texttt{log\_sets} --- FK: \texttt{log\_id}\\[3pt]
+        $\bullet$ \texttt{weight\_history} --- FK: \texttt{user\_id}\\[3pt]
+        \textit{\color{codegray}Theo dõi mức tạ, hiệp tập, cân nặng}
+    };
+
+    % 5. Cụm Dinh dưỡng & Tương tác (Giữa dưới: x từ 7.0 đến 12.8)
+    \draw[thick, draw=academicblue, fill=white, rounded corners=4pt] (7.0, 0.0) rectangle (12.8, 3.2);
+    \fill[academicblue] (7.0, 2.45) rectangle (12.8, 3.2);
+    \node[font=\bfseries\scriptsize, text=white] at (9.9, 2.82) {5. DINH DƯỠNG \& TƯ VẤN};
+    \node[font=\scriptsize, align=left, anchor=north west] at (7.35, 2.25) {
+        $\bullet$ \texttt{foods} --- PK: \texttt{id}\\[3pt]
+        $\bullet$ \texttt{meal\_logs} --- FK: \texttt{user\_id}\\[3pt]
+        $\bullet$ \texttt{messages} --- FK: \texttt{sender\_id}\\[3pt]
+        \textit{\color{codegray}Thực đơn món Việt và hội thoại}
+    };
+
+    % 6. Cụm PT & Đặt lịch hẹn (Phải dưới: x từ 14.0 đến 19.8)
+    \draw[thick, draw=academicblue, fill=white, rounded corners=4pt] (14.0, 0.0) rectangle (19.8, 3.2);
+    \fill[academicblue] (14.0, 2.45) rectangle (19.8, 3.2);
+    \node[font=\bfseries\scriptsize, text=white] at (16.9, 2.82) {6. PT \& ĐẶT LỊCH HẸN};
+    \node[font=\scriptsize, align=left, anchor=north west] at (14.35, 2.25) {
+        $\bullet$ \texttt{trainers} --- FK: \texttt{user\_id}\\[3pt]
+        $\bullet$ \texttt{trainer\_availability} --- FK: \texttt{pt\_id}\\[3pt]
+        $\bullet$ \texttt{bookings} --- FK: \texttt{user\_id}\\[3pt]
+        \textit{\color{codegray}Đặt lịch ca 60 phút và mã QR}
+    };
+
+    % ================= ĐƯỜNG LIÊN KẾT THẲNG HÀNG (KHÔNG CHÉO) =================
+    % Ngang hàng trên
+    \draw[very thick, draw=academicblue, ->] (7.0, 6.2) -- node[above, font=\scriptsize\bfseries] {1 : N} (5.8, 6.2);
+    \draw[very thick, draw=academicblue, ->] (12.8, 6.2) -- node[above, font=\scriptsize\bfseries] {1 : N} (14.0, 6.2);
+
+    % Dọc giữa 2 hàng
+    \draw[very thick, draw=academicblue, ->] (2.9, 4.6) -- node[left, font=\scriptsize\bfseries] {1 : N} (2.9, 3.2);
+    \draw[very thick, draw=academicblue, ->] (9.9, 4.6) -- node[right, font=\scriptsize\bfseries] {1 : N} (9.9, 3.2);
+    \draw[very thick, draw=academicblue, ->] (16.9, 4.6) -- node[right, font=\scriptsize\bfseries] {1 : N} (16.9, 3.2);
+\end{tikzpicture}%
+}
+\caption{Sơ đồ liên kết giữa các cụm bảng thực thể trong cơ sở dữ liệu PostgreSQL}
+\label{fig:erd}
+\end{figure}
+
+\subsection{Đặc tả các bảng dữ liệu chính}
+\label{subsec:dac_ta_bang}
+
+Chức năng lưu trữ và các trường thuộc tính trọng tâm của các bảng dữ liệu trong hệ thống được tổng hợp chi tiết tại \cref{tab:db_tables}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Đặc tả chức năng các cụm bảng dữ liệu chính trong PostgreSQL}
+\label{tab:db_tables}
+\begin{tabularx}{\textwidth}{c p{3.8cm} >{\raggedright\arraybackslash}X}
+    \toprule
+    \textbf{STT} & \textbf{Cụm bảng dữ liệu} & \textbf{Mô tả cấu trúc và chức năng lưu trữ} \\
+    \midrule
+    1 & \texttt{roles}, \texttt{users}, \texttt{otp\_codes} & Lưu thông tin định danh, mật khẩu băm, phân quyền vai trò, hồ sơ thể trạng gồm chiều cao, cân nặng, tiền sử chấn thương và mã xác thực OTP. \\
+    \addlinespace[3pt]
+    2 & \texttt{trainers}, \texttt{trainer\_availability} & Quản lý hồ sơ chuyên môn của PT, chứng chỉ, tỷ lệ hoa hồng, đánh giá sao và các khung giờ rảnh đăng ký làm việc trong tuần. \\
+    \addlinespace[3pt]
+    3 & \texttt{packages}, \texttt{user\_packages}, \texttt{payments} & Lưu danh mục gói tập theo số buổi, theo dõi số buổi tập còn lại, mã PT được tự động phân bổ và lịch sử giao dịch thanh toán. \\
+    \addlinespace[3pt]
+    4 & \texttt{exercises}, \texttt{workout\_plans}, \texttt{plan\_exercises}, \texttt{user\_plans} & Lưu thư viện bài tập cơ sinh học kèm quy tắc loại trừ chấn thương \texttt{avoid\_if}, cấu trúc giáo án bốn pha và trạng thái phê duyệt của PT. \\
+    \addlinespace[3pt]
+    5 & \texttt{workout\_logs}, \texttt{log\_sets}, \texttt{weight\_history} & Ghi nhận nhật ký buổi tập thực tế, số hiệp, mức tạ, số lần lặp, chỉ số RPE từng hiệp và chuỗi thời gian biến động cân nặng. \\
+    \addlinespace[3pt]
+    6 & \texttt{foods}, \texttt{meal\_logs} & Lưu bảng thành phần dinh dưỡng các món ăn Việt Nam và nhật ký ăn uống hàng ngày được đồng bộ từ tính năng quét ảnh thực phẩm. \\
+    \addlinespace[3pt]
+    7 & \texttt{bookings}, \texttt{messages} & Quản lý các ca đặt lịch hẹn 60 phút với PT, thời gian nghỉ đệm 15 phút, mã QR điểm danh, trạng thái ca tập và tin nhắn tư vấn. \\
+    \bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Thiết kế giao diện người dùng}
+\label{sec:thietke_ui}
+
+Giao diện ứng dụng được thiết kế theo phong cách hiện đại, hỗ trợ chuyển đổi linh hoạt giữa giao diện sáng và giao diện tối thông qua \texttt{ThemeContext}, đồng thời tích hợp thanh điều hướng đáy chuyên dụng khi hiển thị trên màn hình điện thoại di động. Toàn bộ hệ thống giao diện được chia thành ba không gian làm việc tách biệt theo vai trò đăng nhập:
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Không gian giao diện dành cho Member:} Bao gồm trang khảo sát \texttt{Onboarding.jsx} thu thập thông số cơ thể theo từng bước trực quan; trang bảng điều khiển trung tâm \texttt{Dashboard.jsx} hiển thị thẻ tổng quan năng lượng \texttt{NutritionOverviewCard}, biểu ngữ gói dịch vụ \texttt{PackageBanner} và lịch tập trong tuần. Từ bảng điều khiển, hội viên có thể mở nhanh các cửa sổ chức năng chuyên sâu gồm \texttt{WorkoutStudioGenerator} để tạo giáo án bốn pha, \texttt{LiveWorkoutModal} tích hợp thanh âm thanh \texttt{AudioCoachBar} hướng dẫn trực tiếp từng hiệp tập, \texttt{AiFoodStudioModal} để tải ảnh món ăn lên phân tích dinh dưỡng, \texttt{BookingModal} để đặt lịch hẹn kèm mã QR và bong bóng \texttt{FloatingChatBubble} để trò chuyện với trợ lý ảo.
+    \item \textbf{Không gian làm việc dành cho PT:} Được xây dựng tại trang \texttt{PtWorkspace.jsx}, cung cấp danh sách học viên đang phụ trách, giao diện xem chi tiết hồ sơ chấn thương và lịch sử suy luận của máy tính. Tại đây, PT thực hiện thao tác phê duyệt hoặc chỉnh sửa trực tiếp các bài tập trong giáo án chờ duyệt, quản lý lịch hẹn trong ngày và quét mã QR để xác nhận hoàn thành buổi dạy.
+    \item \textbf{Không gian quản trị dành cho Admin:} Được tích hợp tại trang \texttt{AdminDashboard.jsx}, cung cấp các bảng biểu thống kê tổng quan số lượng hội viên, doanh thu gói tập, công cụ quản lý danh sách PT, thêm mới hoặc cập nhật thư viện bài tập cơ sinh học và kiểm soát toàn bộ hoạt động vận hành của phòng tập.
+\end{itemize}

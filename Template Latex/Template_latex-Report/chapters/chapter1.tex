@@ -1,0 +1,76 @@
+% ==============================================================================
+% CHƯƠNG 1: TỔNG QUAN VỀ ĐỀ TÀI
+% ==============================================================================
+
+\chapter{TỔNG QUAN VỀ ĐỀ TÀI}
+\label{chap:tongquan}
+
+\section{Bối cảnh và tính cấp thiết của đề tài}
+\label{sec:boicanh}
+
+Trong những năm gần đây, nhu cầu rèn luyện thể hình và chăm sóc sức khỏe chủ động tại Việt Nam phát triển mạnh mẽ ở nhiều nhóm tuổi. Tuy nhiên, phần lớn người mới bắt đầu thường gặp rào cản lớn khi tự thiết kế chương trình tập luyện phù hợp với thể trạng cá nhân. Việc thiếu hụt kiến thức về giải phẫu cơ sinh học và phân bổ khối lượng vận động dễ dẫn đến tình trạng tập luyện quá tải, gây mệt mỏi hệ thần kinh trung ương hoặc phát sinh chấn thương tại các vùng nhạy cảm như khớp gối, khớp vai và cột sống thắt lưng \cite{helms2016rpe}.
+
+Bên cạnh yếu tố vận động, chế độ dinh dưỡng đóng vai trò quyết định đến hiệu quả cải thiện hình thể. Người tập cần kiểm soát chính xác năng lượng nạp vào dựa trên tỷ lệ trao đổi chất cơ bản và mức tiêu hao năng lượng hàng ngày \cite{mifflin1990new}. Mặc dù vậy, các ứng dụng theo dõi sức khỏe phổ biến trên thị trường hiện nay chủ yếu sử dụng cơ sở dữ liệu thực phẩm phương Tây, gây nhiều khó khăn cho người dùng Việt Nam khi cần ước lượng dinh dưỡng cho các món ăn đặc thù như phở bò, cơm tấm, bún chả hay các bữa cơm gia đình.
+
+Mặt khác, tại các phòng tập thương mại, dịch vụ huấn luyện viên cá nhân mang lại hiệu quả giám sát cao nhưng chi phí duy trì thường vượt quá khả năng tài chính của đa số học viên, đặc biệt là sinh viên và người mới đi làm. Ngược lại, nếu phụ thuộc hoàn toàn vào các công cụ sinh văn bản tự động mà thiếu sự kiểm duyệt chuyên môn, người tập có nguy cơ nhận phải các bài tập chống chỉ định với bệnh lý xương khớp sẵn có. Từ thực trạng đó, việc xây dựng đề tài \textbf{``\reporttitle''} kết hợp giữa năng lực tính toán tức thời của trí tuệ nhân tạo và quy trình thẩm định chuyên môn từ huấn luyện viên con người là giải pháp cấp thiết, có giá trị thực tiễn cao.
+
+\section{Lý do chọn đề tài}
+\label{sec:lydo}
+
+Đề tài được lựa chọn thực hiện dựa trên ba nhóm cơ sở trọng tâm về mặt thực tiễn, khoa học công nghệ và tính khả thi khi triển khai:
+
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Ý nghĩa thực tiễn:} Hệ thống giải quyết trực tiếp bài toán cá nhân hóa lộ trình rèn luyện thể chất và kiểm soát dinh dưỡng ẩm thực Việt Nam. Đồng thời, phần mềm số hóa quy trình vận hành phòng tập từ khâu khảo sát thể trạng, mua gói dịch vụ, phân bổ huấn luyện viên đến đặt lịch và điểm danh bằng mã QR.
+    \item \textbf{Ý nghĩa khoa học và công nghệ:} Đề tài kết hợp kiến trúc RAG \cite{lewis2020rag} cùng các mô hình ngôn ngữ lớn chạy cục bộ qua Ollama \cite{ollama2026docs} nhằm loại bỏ hiện tượng suy diễn sai lệch khi tư vấn y học thể thao. Ngoài ra, việc áp dụng kỹ thuật LoRA \cite{hu2022lora} và QLoRA \cite{dettmers2023qlora} để tinh chỉnh mô hình thị giác máy tính phục vụ nhận diện món ăn giúp tối ưu hóa tài nguyên phần cứng mà vẫn đảm bảo độ chính xác cao.
+    \item \textbf{Tính an toàn trong kiến trúc nghiệp vụ:} Thay vì để thuật toán tự quyết định hoàn toàn, hệ thống thiết lập nguyên tắc phân quyền chặt chẽ, trong đó huấn luyện viên cá nhân nắm quyền phê duyệt và ghi đè các đề xuất của máy tính, bảo đảm an toàn tuyệt đối cho hội viên có tiền sử chấn thương.
+\end{enumerate}
+
+\section{Mục tiêu nghiên cứu}
+\label{sec:muctieu}
+
+\subsection{Mục tiêu tổng quát}
+\label{subsec:muctieu_tongquat}
+
+Mục tiêu tổng quát của đề tài là nghiên cứu, thiết kế và xây dựng hoàn chỉnh nền tảng ứng dụng Web quản lý lịch tập thể hình, theo dõi dinh dưỡng và trợ lý huấn luyện thông minh, hỗ trợ cá nhân hóa lộ trình vận động an toàn và kết nối trực tiếp giữa hội viên với đội ngũ huấn luyện viên tại phòng tập.
+
+\subsection{Mục tiêu cụ thể}
+\label{subsec:muctieu_cuthe}
+
+Để hiện thực hóa mục tiêu tổng quát nêu trên, đề tài tập trung giải quyết bốn mục tiêu cụ thể sau:
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Mục tiêu 1:} Xây dựng phân hệ khảo sát thể trạng ban đầu và tự động tính toán các chỉ số BMR, TDEE cùng tỷ lệ phân bổ Protein, Carbohydrate và Fat dựa trên mục tiêu tăng cơ hoặc giảm mỡ của từng người dùng.
+    \item \textbf{Mục tiêu 2:} Thiết kế thuật toán kết hợp mô hình ngôn ngữ lớn và bộ lọc quy tắc cơ sinh học để sinh giáo án tập luyện cấu trúc bốn pha gồm từ 4 đến 6 bài tập mỗi buổi, tự động loại trừ các động tác gây áp lực lên vùng khớp đang chấn thương và tương thích với thiết bị sẵn có.
+    \item \textbf{Mục tiêu 3:} Tinh chỉnh và tích hợp mô hình thị giác máy tính có khả năng phân loại miền ảnh đầu vào, tự động từ chối các hình ảnh không liên quan và bóc tách thành phần, khối lượng cũng như giá trị dinh dưỡng của các món ăn Việt Nam.
+    \item \textbf{Mục tiêu 4:} Phát triển đầy đủ các phân hệ nghiệp vụ phòng tập bao gồm quản lý gói tập theo số buổi, tự động phân bổ huấn luyện viên, quy trình phê duyệt giáo án, đặt lịch hẹn có khoảng thời gian nghỉ đệm, điểm danh bằng mã QR và hướng dẫn phát âm trực tiếp trong buổi tập.
+\end{itemize}
+
+\section{Đối tượng và phạm vi nghiên cứu}
+\label{sec:phamvi}
+
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Đối tượng nghiên cứu:} Các phương pháp tính toán năng lượng dinh dưỡng lâm sàng, nguyên tắc thiết kế chương trình huấn luyện kháng lực, kiến trúc Transformer \cite{vaswani2017attention}, kỹ thuật RAG \cite{lewis2020rag}, các mô hình đa phương thức Qwen2-VL \cite{wang2024qwen2vl}, LLaVA \cite{liu2023llava} và kỹ thuật tinh chỉnh tham số hiệu quả LoRA \cite{hu2022lora}.
+    \item \textbf{Đối tượng sử dụng hệ thống:} Bốn nhóm tác nhân chính gồm hội viên tập luyện, huấn luyện viên cá nhân, trợ lý trí tuệ nhân tạo và quản trị viên hệ thống.
+    \item \textbf{Phạm vi nghiên cứu:} Hệ thống được thiết kế theo mô hình vận hành cho một phòng tập thể hình tiêu chuẩn kết hợp hỗ trợ các bài tập tại nhà. Dữ liệu thực nghiệm tập trung vào các nhóm cơ chính trên cơ thể người và danh mục các món ăn phổ biến trong thực đơn hàng ngày tại Việt Nam.
+\end{itemize}
+
+\section{Phương pháp nghiên cứu và tiếp cận}
+\label{sec:phuongphap}
+
+Đề tài áp dụng phương pháp tiếp cận kết hợp giữa nghiên cứu lý thuyết nền tảng và thực nghiệm phát triển phần mềm theo từng giai đoạn:
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Phương pháp nghiên cứu lý thuyết:} Thu thập, phân tích các công bố khoa học về công thức ước lượng tiêu hao năng lượng Mifflin-St Jeor \cite{mifflin1990new}, thang đo mức độ gắng sức RPE \cite{helms2016rpe}, đồng thời khảo sát kiến trúc mô hình ngôn ngữ lớn và mô hình thị giác -- ngôn ngữ thế hệ mới.
+    \item \textbf{Phương pháp phân tích và thiết kế hệ thống:} Chuẩn hóa ma trận phân quyền RBAC giữa bốn nhóm người dùng, thiết kế kiến trúc phân tầng Client -- Server kết hợp dịch vụ suy luận lai giữa Ollama cục bộ và Google Gemini API, đồng thời xây dựng lược đồ cơ sở dữ liệu quan hệ trên PostgreSQL \cite{postgresql2026docs}.
+    \item \textbf{Phương pháp thực nghiệm và kiểm thử:} Xây dựng tập dữ liệu bài tập an toàn cơ sinh học và kho tri thức dinh dưỡng, tiến hành tinh chỉnh mô hình thị giác, đóng gói ứng dụng Web và kiểm thử toàn diện các kịch bản nghiệp vụ từ khâu đăng ký đến khi hoàn thành buổi tập.
+\end{enumerate}
+
+\section{Cấu trúc của báo cáo}
+\label{sec:cautruc}
+
+Nội dung của báo cáo học phần được tổ chức thành 5 chương chính như sau:
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{\cref{chap:tongquan} -- Tổng quan về đề tài:} Trình bày bối cảnh thực tiễn, lý do chọn đề tài, mục tiêu, đối tượng, phạm vi và phương pháp nghiên cứu.
+    \item \textbf{\cref{chap:cossolythuyet} -- Cơ sở lý thuyết và công nghệ:} Hệ thống hóa nền tảng khoa học thể thao, dinh dưỡng lâm sàng, lý thuyết mô hình ngôn ngữ lớn, mô hình thị giác -- ngôn ngữ, kỹ thuật RAG, LoRA và các công nghệ phát triển ứng dụng Web.
+    \item \textbf{\cref{chap:thietke} -- Phân tích và thiết kế hệ thống:} Phân tích yêu cầu chức năng và phi chức năng, ma trận phân quyền, sơ đồ Use Case, kiến trúc tổng thể, luồng xử lý của các mô-đun thông minh, lược đồ cơ sở dữ liệu và thiết kế giao diện.
+    \item \textbf{\cref{chap:trienkhai} -- Triển khai và thực nghiệm:} Trình bày môi trường cài đặt, quy trình chuẩn bị dữ liệu, tinh chỉnh mô hình, kết quả hiện thực hóa các phân hệ chức năng và đánh giá kiểm thử thực nghiệm.
+    \item \textbf{\cref{chap:ketluan} -- Đánh giá và kết luận:} Tổng kết những kết quả đã đạt được, phân tích ưu điểm cùng hạn chế tồn tại và đề xuất hướng mở rộng hệ thống trong tương lai.
+\end{itemize}

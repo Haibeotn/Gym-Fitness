@@ -98,7 +98,7 @@ export default function ExerciseLibraryModal({ isOpen, onClose, onAddExercise })
                         </div>
                         <div>
                             <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2.5">
-                                Thư Viện Bài Tập Chuẩn Hóa AI
+                                Thư Viện Bài Tập
                                 <span className="text-xs sm:text-sm px-3 py-1 rounded-full bg-cyan-500/10 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 font-mono font-bold border border-cyan-500/20">
                                     {exercises.length} Bài tập
                                 </span>

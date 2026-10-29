@@ -2,11 +2,11 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: 'http://localhost:3000/api',
+    baseURL: 'http://localhost:3000/api', // Bắt buộc phải có http://localhost:3000/api khi chạy localhost
     headers: {
         'Content-Type': 'application/json',
     },
-});
+})
 
 // Tự động đính kèm JWT Token vào Header của mọi Request nếu có
 API.interceptors.request.use((config) => {
@@ -241,8 +241,16 @@ export const fetchFoodSuggestions = async (search = '') => {
 };
 
 export const fetchDailyMeals = async (date) => {
+    let targetDate = date;
+    if (!targetDate) {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        targetDate = `${yyyy}-${mm}-${dd}`;
+    }
     const response = await API.get('/meals/daily', {
-        params: { date }
+        params: { date: targetDate }
     });
     return response.data;
 };
@@ -261,6 +269,11 @@ export const fetchMealHistory = async (days = 7) => {
     const response = await API.get('/meals/history', {
         params: { days }
     });
+    return response.data;
+};
+
+export const analyzeFoodImage = async (payload) => {
+    const response = await API.post('/meals/analyze-image', payload);
     return response.data;
 };
 
@@ -286,8 +299,8 @@ export const fetchUnreadCount = async () => {
 };
 
 export const askLocalAiCoach = async (prompt, history = [], options = {}) => {
-    const response = await API.post('/chat/local-coach', { 
-        prompt, 
+    const response = await API.post('/chat/local-coach', {
+        prompt,
         history,
         assistantType: options.assistantType,
         clientContext: options.clientContext

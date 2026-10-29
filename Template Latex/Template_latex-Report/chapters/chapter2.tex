@@ -1,0 +1,134 @@
+% ==============================================================================
+% CHƯƠNG 2: CƠ SỞ LÝ THUYẾT VÀ CÔNG NGHỆ
+% ==============================================================================
+
+\chapter{CƠ SỞ LÝ THUYẾT VÀ CÔNG NGHỆ}
+\label{chap:cossolythuyet}
+
+\section{Cơ sở khoa học thể thao và dinh dưỡng lâm sàng}
+\label{sec:khoahoc_thethao}
+
+\subsection{Mô hình tính toán năng lượng BMR, TDEE và phân bổ Macronutrients}
+\label{subsec:bmr_tdee}
+
+Trong khoa học dinh dưỡng thể thao, việc thiết lập khẩu phần ăn cá nhân hóa luôn bắt đầu từ bước xác định nhu cầu năng lượng nền tảng của cơ thể. Chỉ số BMR biểu thị lượng năng lượng tối thiểu mà cơ thể tiêu thụ trong trạng thái nghỉ ngơi hoàn toàn để duy trì các hoạt động sinh tồn như hô hấp, tuần hoàn máu và điều hòa thân nhiệt. Qua nhiều nghiên cứu thực nghiệm lâm sàng, công thức Mifflin-St Jeor đã được chứng minh có độ chính xác cao nhất khi ước lượng BMR cho người trưởng thành khỏe mạnh \cite{mifflin1990new}.
+
+Gọi $W$ là cân nặng tính bằng kilôgam, $H$ là chiều cao tính bằng xăngtimét và $A$ là độ tuổi tính theo năm, giá trị BMR tính bằng đơn vị kcal/ngày được xác định theo \cref{eq:bmr}:
+\begin{equation}
+    \text{BMR} = 10W + 6.25H - 5A + s, \quad \text{với } s = \begin{cases} +5 & \text{đối với nam giới} \\ -161 & \text{đối với nữ giới} \end{cases}
+    \label{eq:bmr}
+\end{equation}
+
+Từ chỉ số trao đổi chất cơ bản, tổng năng lượng tiêu hao thực tế trong một ngày được biểu diễn qua chỉ số TDEE bằng cách nhân BMR với hệ số cường độ vận động thể chất $K_{\text{act}} \in \{1.2, 1.375, 1.55, 1.725, 1.9\}$, tương ứng từ mức ít vận động đến vận động cường độ rất cao. Lượng năng lượng mục tiêu hàng ngày $C_{\text{target}}$ được điều chỉnh theo định hướng hình thể của người tập và phải tuân thủ ngưỡng an toàn sinh học tối thiểu $1200\text{ kcal/ngày}$ như thể hiện tại \cref{eq:tdee}:
+\begin{equation}
+    \text{TDEE} = \text{BMR} \times K_{\text{act}}, \qquad C_{\text{target}} = \max\left(1200,\; \text{TDEE} + \Delta C\right)
+    \label{eq:tdee}
+\end{equation}
+trong đó $\Delta C = -500\text{ kcal}$ đối với mục tiêu giảm mỡ để tạo mức thâm hụt năng lượng an toàn khoảng $0.5\text{ kg/tuần}$, $\Delta C = +300\text{ kcal}$ đối với mục tiêu tăng cơ nhằm hạn chế tích tụ mỡ thừa, và $\Delta C = 0\text{ kcal}$ khi duy trì thể trạng.
+
+Sau khi xác định được $C_{\text{target}}$, hệ thống tiến hành phân bổ ba nhóm chất dinh dưỡng đa lượng gồm Protein, Fat và Carbohydrate dựa trên giá trị sinh nhiệt tiêu chuẩn là $4\text{ kcal/g}$ đối với Protein và Carbohydrate, cùng $9\text{ kcal/g}$ đối với Fat. Để tối ưu hóa quá trình tổng hợp sợi cơ và bảo toàn khối lượng nạc trong giai đoạn thâm hụt calo, lượng Protein được ấn định ở mức $2.2\text{ g}$ trên mỗi kilôgam trọng lượng cơ thể. Lượng Fat chiếm $25\%$ tổng năng lượng mục tiêu nhằm duy trì hoạt động nội tiết tố, và phần năng lượng còn lại được quy đổi sang Carbohydrate theo \cref{eq:macros}:
+\begin{equation}
+    M_{\text{protein}} = 2.2W, \qquad M_{\text{fat}} = \frac{0.25 C_{\text{target}}}{9}, \qquad M_{\text{carb}} = \frac{C_{\text{target}} - 4M_{\text{protein}} - 9M_{\text{fat}}}{4}
+    \label{eq:macros}
+\end{equation}
+
+\subsection{Nguyên tắc thiết kế giáo án bốn pha, chỉ số RPE và an toàn cơ sinh học}
+\label{subsec:nguyen_tac_tap}
+
+Một chương trình huấn luyện kháng lực hiệu quả đòi hỏi sự cân bằng chặt chẽ giữa kích thích cơ học và khả năng phục hồi của hệ thần kinh trung ương. Việc thực hiện quá nhiều bài tập trong một buổi thường dẫn đến hiện tượng Junk Volume, tức các hiệp tập dư thừa chỉ gây suy kiệt năng lượng và làm tăng nguy cơ chấn thương khớp mà không mang lại thêm lợi ích phát triển cơ bắp. Do đó, hệ thống áp dụng cấu trúc buổi tập chuẩn hóa gồm từ 4 đến 6 bài tập, phân bổ tuần tự qua bốn pha sinh lý học được tổng hợp tại \cref{tab:four_phases}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Cấu trúc bốn pha khoa học trong một buổi huấn luyện kháng lực}
+\label{tab:four_phases}
+\begin{tabularx}{\textwidth}{c l c c c >{\raggedright\arraybackslash}X}
+    \toprule
+    \textbf{Pha} & \textbf{Tên pha huấn luyện} & \textbf{Số hiệp} & \textbf{Lần lặp} & \textbf{RPE} & \textbf{Mục tiêu cơ sinh học} \\
+    \midrule
+    1 & Primary Compound & 4 & 6 -- 8 & 8.0 & Kích hoạt tối đa các đơn vị vận động đa khớp khi hệ thần kinh còn sung sức nhất. \\
+    \addlinespace[4pt]
+    2 & Secondary Assistance & 3 & 8 -- 10 & 8.0 & Bổ trợ phát triển nhóm cơ mục tiêu ở các góc độ chuyển động đa dạng. \\
+    \addlinespace[4pt]
+    3 & Isolation / Finisher & 3 & 12 -- 15 & 8.5 -- 9.0 & Cô lập một khớp duy nhất, tạo áp lực chuyển hóa mà không gây tải nặng lên cột sống. \\
+    \addlinespace[4pt]
+    4 & Core / Cool-down & 2 -- 3 & 15 -- 20 & 7.0 -- 7.5 & Gia cố nhóm cơ lõi bảo vệ vùng thắt lưng và điều hòa nhịp tim cuối buổi. \\
+    \bottomrule
+\end{tabularx}
+\end{table}
+
+Cường độ gắng sức trong từng hiệp tập được kiểm soát định lượng thông qua thang đo RPE dựa trên số lần lặp dự trữ \cite{helms2016rpe}. Ở mức $\text{RPE } 8.0$, người tập dừng hiệp khi cơ bắp vẫn còn khả năng thực hiện thêm đúng 2 lần lặp chuẩn kỹ thuật, giúp kích thích tăng trưởng sợi cơ tối ưu đồng thời ngăn ngừa hiện tượng mất kiểm soát tư thế ở những lần lặp cuối. Bên cạnh đó, nhịp độ chuyển động Tempo được chuẩn hóa dưới dạng chuỗi bốn tham số thời gian, chẳng hạn \texttt{3-0-1-0}, quy định 3 giây hạ tạ có kiểm soát để tăng thời gian cơ chịu áp lực, 0 giây nghỉ ở điểm thấp nhất, 1 giây phát lực đẩy tạ và 0 giây nghỉ ở đỉnh biên độ.
+
+Đặc biệt, đối với người tập có tiền sử đau mỏi hoặc tổn thương xương khớp, nguyên tắc sàng lọc chống chỉ định cơ sinh học được áp dụng nhất quán:
+\begin{itemize}[leftmargin=1.5cm, itemsep=4pt, topsep=4pt]
+    \item \textbf{Chấn thương khớp gối:} Loại trừ các bài tạo áp lực nén và lực cắt lớn lên sụn chêm như Back Squat sâu hoặc Walking Lunge; ưu tiên thay thế bằng các bài tập chuỗi cơ sau như Glute Bridge, Hip Thrust hoặc Box Squat giới hạn biên độ.
+    \item \textbf{Chấn thương cột sống thắt lưng:} Loại trừ các bài tạo mô-men xoắn và lực nén dọc trục đĩa đệm như Deadlift nặng hoặc Bent-Over Barbell Row tự do; ưu tiên các bài có điểm đỡ ngực như Chest-Supported Dumbbell Row và Lat Pulldown.
+    \item \textbf{Chấn thương khớp vai và chóp xoay:} Tránh các góc dạng vai 90 độ hoặc đẩy tạ sau gáy; ưu tiên tư thế cầm tạ trung tính hai lòng bàn tay hướng vào nhau hoặc Dumbbell Floor Press trên sàn phẳng để khóa biên độ hạ tạ an toàn.
+\end{itemize}
+
+\section{Mô hình ngôn ngữ lớn và kỹ thuật RAG}
+\label{sec:llm_rag}
+
+\subsection{Kiến trúc Transformer và mô hình ngôn ngữ tự hồi quy}
+\label{subsec:transformer_llm}
+
+Nền tảng cốt lõi của các mô hình ngôn ngữ lớn hiện đại như họ mô hình Qwen2.5 và Google Gemini là kiến trúc mạng nơ-ron Transformer \cite{vaswani2017attention}. Thay vì xử lý tuần tự từng từ như mạng hồi quy truyền thống, Transformer sử dụng cơ chế Self-Attention để mô hình hóa mối quan hệ phụ thuộc tầm xa giữa mọi cặp token trong chuỗi văn bản đầu vào. Với các ma trận truy vấn $\mat{Q}$, ma trận khóa $\mat{K}$ có số chiều $d_k$ và ma trận giá trị $\mat{V}$, trọng số chú ý được tính toán theo \cref{eq:attention}:
+\begin{equation}
+    \text{Attention}(\mat{Q}, \mat{K}, \mat{V}) = \text{softmax}\left(\frac{\mat{Q}\mat{K}^{\top}}{\sqrt{d_k}}\right)\mat{V}
+    \label{eq:attention}
+\end{equation}
+
+Trong bài toán sinh văn bản tư vấn huấn luyện, mô hình hoạt động theo cơ chế tự hồi quy, ước lượng phân phối xác suất của chuỗi phản hồi $\vect{y} = (y_1, y_2, \dots, y_T)$ dựa trên ngữ cảnh đầu vào $\vect{x}$ theo quy tắc chuỗi xác suất tại \cref{eq:autoregressive}:
+\begin{equation}
+    P(\vect{y} \mid \vect{x}; \vect{\Theta}) = \prod_{t=1}^{T} P(y_t \mid y_{<t}, \vect{x}; \vect{\Theta})
+    \label{eq:autoregressive}
+\end{equation}
+Để kiểm soát tính nhất quán chuyên môn và hạn chế lặp từ khi sinh danh sách nhiều bài tập liên tiếp, quá trình giải mã áp dụng lấy mẫu hạt nhân kết hợp tham số nhiệt độ thấp $T = 0.25$ và hệ số phạt lặp từ $\text{repeat\_penalty} = 1.18$.
+
+\subsection{Kỹ thuật RAG và thiết kế ràng buộc ngữ cảnh}
+\label{subsec:rag}
+
+Mặc dù các mô hình ngôn ngữ lớn có khả năng diễn đạt ngôn ngữ tự nhiên lưu loát, việc chỉ dựa vào tri thức tham số nội tại thường dẫn đến hiện tượng suy diễn sai số liệu dinh dưỡng hoặc gợi ý bài tập không phù hợp với chấn thương của người dùng. Kỹ thuật RAG khắc phục triệt để hạn chế này bằng cách tách biệt kho tri thức xác thực ra khỏi bộ trọng số mô hình \cite{lewis2020rag}.
+
+Cụ thể, khi nhận được yêu cầu tư vấn từ người dùng $\vect{q}$ kèm theo hồ sơ thể trạng, bộ truy xuất sẽ tìm kiếm các bản ghi phù hợp nhất $\mathcal{D}_{\text{ret}} = \{d_1, d_2, \dots, d_k\}$ từ cơ sở dữ liệu bài tập cơ sinh học và bảng thành phần dinh dưỡng ẩm thực Việt Nam. Các bản ghi đã qua kiểm duyệt này được tiêm trực tiếp vào khung chỉ thị hệ thống để buộc mô hình chỉ được phép tổng hợp câu trả lời nằm trong phạm vi dữ liệu xác thực:
+\begin{equation}
+    \hat{\vect{y}} = \argmax_{\vect{y}} P\left(\vect{y} \;\middle|\; \text{Prompt}(\vect{q}, \mathcal{D}_{\text{ret}}, \mathcal{C}_{\text{injury}}); \vect{\Theta}\right)
+    \label{eq:rag_generation}
+\end{equation}
+trong đó $\mathcal{C}_{\text{injury}}$ là tập ràng buộc loại trừ chấn thương bắt buộc. Nhờ sự kết hợp giữa truy xuất dữ liệu có cấu trúc và suy luận ngôn ngữ, hệ thống vừa đảm bảo tính chính xác tuyệt đối về mặt số liệu, vừa mang lại lời giải thích sinh động, dễ hiểu cho hội viên.
+
+\section{Mô hình thị giác -- ngôn ngữ và kỹ thuật tinh chỉnh LoRA / QLoRA}
+\label{sec:vlm_lora}
+
+\subsection{Phân tích hình ảnh thực phẩm với mô hình đa phương thức}
+\label{subsec:vlm}
+
+Để tự động hóa quy trình ghi nhận nhật ký dinh dưỡng qua ảnh chụp bữa ăn, đề tài ứng dụng các mô hình đa phương thức kết hợp thị giác và ngôn ngữ, tiêu biểu là Qwen2-VL \cite{wang2024qwen2vl} và LLaVA \cite{liu2023llava}. Kiến trúc tổng quát của mô hình bao gồm ba khối thành phần nối tiếp nhau:
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Bộ mã hóa thị giác:} Chia hình ảnh đầu vào thành lưới các mảnh ảnh và trích xuất chuỗi đặc trưng không gian thông qua mạng Vision Transformer. Đặc biệt, Qwen2-VL tích hợp cơ chế xử lý độ phân giải động kết hợp mã hóa vị trí xoay hai chiều, giúp nhận diện chính xác các thành phần món ăn có kích thước và tỷ lệ khung hình khác nhau.
+    \item \textbf{Bộ chiếu đa phương thức:} Sử dụng mạng nơ-ron truyền thẳng để ánh xạ các véc-tơ đặc trưng hình ảnh sang cùng không gian biểu diễn véc-tơ với các token từ vựng của mô hình ngôn ngữ.
+    \item \textbf{Bộ giải mã ngôn ngữ:} Tiếp nhận đồng thời chuỗi đặc trưng thị giác và câu lệnh yêu cầu để thực hiện phân loại miền ảnh cũng như sinh đối tượng JSON mô tả tên món ăn, danh sách nguyên liệu kèm khối lượng ước tính bằng đơn vị gram.
+\end{enumerate}
+
+\subsection{Kỹ thuật tinh chỉnh LoRA và lượng tử hóa 4-bit QLoRA}
+\label{subsec:lora_qlora}
+
+Việc huấn luyện lại toàn bộ hàng tỷ tham số của mô hình Qwen2-VL-7B đòi hỏi tài nguyên bộ nhớ đồ họa rất lớn. Để giải quyết bài toán này, kỹ thuật LoRA đóng băng toàn bộ ma trận trọng số tiền huấn luyện $\mat{W}_0 \in \R^{d \times k}$ và chỉ chèn thêm hai ma trận phân rã hạng thấp $\mat{B} \in \R^{d \times r}$ và $\mat{A} \in \R^{r \times k}$ vào các tầng chiếu chú ý và mạng truyền thẳng \cite{hu2022lora}. Phép biến đổi tuyến tính của tầng mạng đối với đầu vào $\vect{h}$ khi đó được tính theo \cref{eq:lora}:
+\begin{equation}
+    \vect{h}' = \mat{W}_0 \vect{h} + \Delta \mat{W}\vect{h} = \mat{W}_0 \vect{h} + \frac{\alpha}{r} \mat{B}\mat{A}\vect{h}, \qquad \text{với } r \ll \min(d, k)
+    \label{eq:lora}
+\end{equation}
+Trong đó, $r$ là hạng của ma trận thích nghi và $\alpha$ là hệ số tỷ lệ giúp ổn định tốc độ học. Bằng cách thiết lập $r = 16$ và $\alpha = 16$, số lượng tham số cần cập nhật gradient giảm đi hơn $98\%$ so với tinh chỉnh toàn phần.
+
+Hơn nữa, kỹ thuật QLoRA tiếp tục nén ma trận trọng số gốc $\mat{W}_0$ từ định dạng số thực 16-bit xuống kiểu dữ liệu NormalFloat 4-bit kết hợp lượng tử hóa kép \cite{dettmers2023qlora}. Trong quá trình lan truyền xuôi và lan truyền ngược, trọng số nền 4-bit được giải nén tạm thời về định dạng 16-bit để thực hiện phép nhân ma trận với nhánh LoRA, giúp toàn bộ quá trình tinh chỉnh mô hình thị giác 7 tỷ tham số thực thi trơn tru trên một card đồ họa đơn lẻ.
+
+\section{Các công nghệ phát triển hệ thống ứng dụng}
+\label{sec:congnghe}
+
+Hệ thống phần mềm của đề tài được xây dựng theo kiến trúc ứng dụng Web hiện đại, kết hợp các công nghệ mã nguồn mở hiệu năng cao ở cả bốn tầng:
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Tầng giao diện người dùng:} Sử dụng thư viện React phiên bản 19 kết hợp công cụ đóng gói Vite và Tailwind CSS phiên bản 4 để xây dựng ứng dụng trang đơn có tốc độ phản hồi tức thời. Giao diện tích hợp thư viện \texttt{qrcode.react} phục vụ sinh mã điểm danh buổi tập, \texttt{html2canvas} để xuất phiếu báo cáo thể trạng và Web Speech API kết hợp dịch vụ chuyển văn bản thành giọng nói nhằm phát âm hướng dẫn kỹ thuật trực tiếp trong lúc tập.
+    \item \textbf{Tầng dịch vụ máy chủ:} Được phát triển trên nền tảng Node.js và framework Express phiên bản 5 theo chuẩn kiến trúc RESTful API. Cơ chế bảo mật sử dụng thuật toán băm mật khẩu một chiều \texttt{bcrypt} cùng chuẩn xác thực không trạng thái JWT để kiểm soát phân quyền truy cập giữa hội viên, huấn luyện viên và quản trị viên.
+    \item \textbf{Tầng quản trị cơ sở dữ liệu:} Sử dụng hệ quản trị cơ sở dữ liệu quan hệ PostgreSQL \cite{postgresql2026docs} thông qua trình điều khiển kết nối \texttt{pg} Pool, đảm bảo tính toàn vẹn tham chiếu và xử lý giao dịch đồng thời an toàn cho các nghiệp vụ đặt lịch, trừ buổi tập và phê duyệt giáo án.
+    \item \textbf{Tầng suy luận trí tuệ nhân tạo lai:} Tích hợp song song máy chủ suy luận cục bộ Ollama \cite{ollama2026docs} vận hành các mô hình đã tùy biến qua \texttt{Modelfile} và gói thư viện \texttt{@google/generative-ai} kết nối tới mô hình đám mây Gemini Flash, giúp hệ thống duy trì tính sẵn sàng cao và tự động chuyển đổi dự phòng khi một trong hai nguồn xử lý gặp sự cố.
+\end{itemize}

@@ -28,6 +28,53 @@ const INJURY_RULES = {
 };
 
 /**
+ * BẢNG ÁNH XẠ ĐỒNG NGHĨA NHÓM CƠ SONG NGỮ ANH - VIỆT (BILINGUAL MUSCLE TAXONOMY)
+ */
+const MUSCLE_SYNONYMS = {
+    'chest': ['Chest', 'Ngực', 'Pectorals', 'Upper Chest', 'Inner Chest'],
+    'ngực': ['Chest', 'Ngực', 'Pectorals'],
+    'back': ['Back', 'Lats', 'Upper Back', 'Lower Back', 'Lưng', 'Xô', 'Rhomboids', 'Traps'],
+    'lats': ['Lats', 'Back', 'Xô', 'Lưng xô'],
+    'lưng': ['Back', 'Lats', 'Upper Back', 'Lưng', 'Xô'],
+    'xô': ['Lats', 'Back', 'Xô', 'Lưng xô'],
+    'shoulders': ['Shoulders', 'Deltoids', 'Front Deltoids', 'Rear Delts', 'Vai'],
+    'vai': ['Shoulders', 'Deltoids', 'Front Deltoids', 'Rear Delts', 'Vai'],
+    'biceps': ['Biceps', 'Tay trước', 'Brachialis', 'Forearms'],
+    'tay trước': ['Biceps', 'Tay trước', 'Forearms'],
+    'triceps': ['Triceps', 'Tay sau'],
+    'tay sau': ['Triceps', 'Tay sau'],
+    'arms': ['Biceps', 'Triceps', 'Forearms', 'Tay trước', 'Tay sau'],
+    'tay': ['Biceps', 'Triceps', 'Forearms', 'Tay trước', 'Tay sau'],
+    'legs': ['Quadriceps', 'Hamstrings', 'Glutes', 'Calves', 'Chân', 'Đùi trước', 'Đùi sau'],
+    'quadriceps': ['Quadriceps', 'Glutes', 'Hamstrings', 'Calves', 'Đùi trước', 'Chân'],
+    'hamstrings': ['Hamstrings', 'Glutes', 'Quadriceps', 'Đùi sau'],
+    'chân': ['Quadriceps', 'Hamstrings', 'Glutes', 'Calves', 'Chân'],
+    'đùi': ['Quadriceps', 'Hamstrings', 'Glutes'],
+    'glutes': ['Glutes', 'Hamstrings', 'Quadriceps', 'Mông'],
+    'mông': ['Glutes', 'Hamstrings', 'Mông'],
+    'core': ['Core', 'Abs', 'Obliques', 'Bụng', 'Lower Back'],
+    'bụng': ['Core', 'Abs', 'Obliques', 'Bụng'],
+    'full body': ['Full Body', 'Chest', 'Back', 'Quadriceps', 'Shoulders', 'Core'],
+    'toàn thân': ['Full Body', 'Chest', 'Back', 'Quadriceps', 'Shoulders', 'Core']
+};
+
+function expandTargetMuscles(rawMuscles = []) {
+    const expanded = new Set();
+    rawMuscles.forEach(m => {
+        if (!m) return;
+        const clean = m.trim();
+        expanded.add(clean);
+        const lower = clean.toLowerCase();
+        for (const [key, synList] of Object.entries(MUSCLE_SYNONYMS)) {
+            if (lower === key || lower.includes(key)) {
+                synList.forEach(s => expanded.add(s));
+            }
+        }
+    });
+    return Array.from(expanded);
+}
+
+/**
  * MỞ RỘNG DANH MỤC THIẾT BỊ ĐỒNG NGHĨA (EQUIPMENT SYNONYMS)
  */
 function expandEquipment(equipmentList = []) {
@@ -68,13 +115,14 @@ function expandEquipment(equipmentList = []) {
  */
 const generateSafeExercises = async (targetMuscles, userInjuries = [], availableEquipment = [], environment = 'all', limit = 6) => {
     try {
-        // 1. Chuẩn hóa danh sách nhóm cơ
-        let muscleList = [];
+        // 1. Chuẩn hóa & mở rộng danh sách nhóm cơ song ngữ Anh - Việt
+        let rawMuscleList = [];
         if (Array.isArray(targetMuscles)) {
-            muscleList = targetMuscles.filter(m => m && m !== 'All' && m !== 'Tất cả');
+            rawMuscleList = targetMuscles.filter(m => m && m !== 'All' && m !== 'Tất cả');
         } else if (typeof targetMuscles === 'string' && targetMuscles.trim() && targetMuscles !== 'All' && targetMuscles !== 'Tất cả') {
-            muscleList = [targetMuscles.trim()];
+            rawMuscleList = [targetMuscles.trim()];
         }
+        const muscleList = expandTargetMuscles(rawMuscleList);
 
         const safeInjuries = Array.isArray(userInjuries) ? userInjuries : (userInjuries ? [userInjuries] : []);
         let safeEquipment = expandEquipment(Array.isArray(availableEquipment) ? availableEquipment : []);
@@ -101,12 +149,13 @@ const generateSafeExercises = async (targetMuscles, userInjuries = [], available
         const queryParams = [];
         let paramIndex = 1;
 
-        // Lọc nhóm cơ (nếu có chọn)
+        // Lọc nhóm cơ (nếu có chọn): Khớp primary_muscle, secondary_muscles hoặc tags
         if (muscleList.length > 0) {
             baseQuery += ` AND (
                 primary_muscle = ANY($${paramIndex}) 
                 OR primary_muscle ILIKE ANY(SELECT '%' || unnest($${paramIndex}::text[]) || '%')
                 OR secondary_muscles && $${paramIndex}::text[]
+                OR tags && $${paramIndex}::text[]
             )`;
             queryParams.push(muscleList);
             paramIndex++;
@@ -185,7 +234,14 @@ const generateSafeExercises = async (targetMuscles, userInjuries = [], available
         const isolations = [];
         const coreExercises = [];
 
-        filteredPool.forEach(ex => {
+        // Ưu tiên đẩy các bài tập có primary_muscle khớp trực tiếp với nhóm cơ mục tiêu lên đầu danh sách
+        const sortedPool = [...filteredPool].sort((a, b) => {
+            const aPrimaryMatch = muscleList.some(m => (a.primary_muscle || '').toLowerCase() === m.toLowerCase()) ? 1 : 0;
+            const bPrimaryMatch = muscleList.some(m => (b.primary_muscle || '').toLowerCase() === m.toLowerCase()) ? 1 : 0;
+            return bPrimaryMatch - aPrimaryMatch;
+        });
+
+        sortedPool.forEach(ex => {
             const isCompound = ex.mechanic === 'Compound';
             const isCore = (ex.primary_muscle || '').toLowerCase().includes('core') || 
                            (ex.primary_muscle || '').toLowerCase().includes('abs') ||

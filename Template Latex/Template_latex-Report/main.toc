@@ -1,0 +1,76 @@
+\contentsline {chapter}{LỜI CAM ĐOAN}{i}{chapter*.1}%
+\contentsline {chapter}{LỜI CẢM ƠN}{ii}{chapter*.2}%
+\contentsline {chapter}{TÓM TẮT BÁO CÁO}{iii}{chapter*.3}%
+\contentsline {chapter}{DANH MỤC TỪ VIẾT TẮT}{v}{chapter*.4}%
+\contentsline {chapter}{DANH MỤC THUẬT NGỮ}{vi}{chapter*.6}%
+\contentsline {chapter}{DANH MỤC HÌNH ẢNH}{xi}{section*.10}%
+\contentsline {chapter}{DANH MỤC BẢNG}{xii}{section*.12}%
+\contentsline {chapter}{\numberline {1}TỔNG QUAN VỀ ĐỀ TÀI}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Bối cảnh và tính cấp thiết của đề tài}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Lý do chọn đề tài}{2}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Mục tiêu nghiên cứu}{2}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Mục tiêu tổng quát}{2}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Mục tiêu cụ thể}{2}{subsection.1.3.2}%
+\contentsline {section}{\numberline {1.4}Đối tượng và phạm vi nghiên cứu}{3}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Phương pháp nghiên cứu và tiếp cận}{3}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Cấu trúc của báo cáo}{4}{section.1.6}%
+\contentsline {chapter}{\numberline {2}CƠ SỞ LÝ THUYẾT VÀ CÔNG NGHỆ}{5}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Cơ sở khoa học thể thao và dinh dưỡng lâm sàng}{5}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Mô hình tính toán năng lượng BMR, TDEE và phân bổ Macronutrients}{5}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Nguyên tắc thiết kế giáo án bốn pha, chỉ số RPE và an toàn cơ sinh học}{6}{subsection.2.1.2}%
+\contentsline {section}{\numberline {2.2}Mô hình ngôn ngữ lớn và kỹ thuật RAG}{7}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Kiến trúc Transformer và mô hình ngôn ngữ tự hồi quy}{7}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Kỹ thuật RAG và thiết kế ràng buộc ngữ cảnh}{8}{subsection.2.2.2}%
+\contentsline {section}{\numberline {2.3}Mô hình thị giác -- ngôn ngữ và kỹ thuật tinh chỉnh LoRA / QLoRA}{8}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Phân tích hình ảnh thực phẩm với mô hình đa phương thức}{8}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Kỹ thuật tinh chỉnh LoRA và lượng tử hóa 4-bit QLoRA}{9}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Các công nghệ phát triển hệ thống ứng dụng}{10}{section.2.4}%
+\contentsline {chapter}{\numberline {3}PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG}{11}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Phân tích yêu cầu bài toán}{11}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Xác định tác nhân và ma trận phân quyền RBAC}{11}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Yêu cầu chức năng}{11}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.1.3}Yêu cầu phi chức năng}{12}{subsection.3.1.3}%
+\contentsline {section}{\numberline {3.2}Phân tích nghiệp vụ và thiết kế Use Case}{13}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Sơ đồ phân rã chức năng theo tác nhân}{13}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Đặc tả các luồng nghiệp vụ trọng tâm}{13}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}Thiết kế kiến trúc tổng thể và các Pipeline AI}{14}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Kiến trúc tổng thể hệ thống}{14}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Thiết kế Pipeline tư vấn giáo án cơ sinh học và trợ lý RAG Chat}{15}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Thiết kế Pipeline thị giác máy tính quét món ăn}{16}{subsection.3.3.3}%
+\contentsline {section}{\numberline {3.4}Thiết kế cơ sở dữ liệu}{16}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Sơ đồ liên kết thực thể}{16}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Đặc tả các bảng dữ liệu chính}{17}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Thiết kế giao diện người dùng}{17}{section.3.5}%
+\contentsline {chapter}{\numberline {4}TRIỂN KHAI VÀ THỰC NGHIỆM}{20}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Môi trường cài đặt và công cụ thực nghiệm}{20}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Xây dựng tập dữ liệu và tinh chỉnh mô hình}{20}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Xây dựng dữ liệu bài tập cơ sinh học và tri thức dinh dưỡng ẩm thực Việt}{20}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Tinh chỉnh mô hình nhận diện thực phẩm và cấu hình Modelfile trên Ollama}{21}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Hiện thực hóa các phân hệ chức năng chính}{22}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Phân hệ khảo sát thể trạng và thiết kế giáo án thông minh}{22}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Phân hệ quét ảnh thực phẩm và trợ lý hội thoại RAG Chat}{22}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Phân hệ đặt lịch hẹn, phê duyệt giáo án và quản trị hệ thống}{23}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}Kết quả thực nghiệm và đánh giá hệ thống}{23}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Đánh giá mô-đun trí tuệ nhân tạo}{23}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Kiểm thử chức năng nghiệp vụ và thời gian phản hồi API}{23}{subsection.4.4.2}%
+\contentsline {chapter}{\numberline {5}ĐÁNH GIÁ VÀ KẾT LUẬN}{26}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Các kết quả đạt được}{26}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Đánh giá ưu điểm và hạn chế}{27}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Ưu điểm nổi bật}{27}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Hạn chế còn tồn tại}{27}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}Hướng phát triển trong tương lai}{27}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Lời kết}{28}{section.5.4}%
+\contentsline {chapter}{TÀI LIỆU THAM KHẢO}{29}{section*.24}%
+\contentsline {chapter}{\numberline {A}MÃ NGUỒN CHƯƠNG TRÌNH}{31}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Liên kết kho mã nguồn}{31}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Cấu trúc cây thư mục của dự án phần mềm}{31}{section.A.2}%
+\contentsline {chapter}{\numberline {B}HƯỚNG DẪN CÀI ĐẶT VÀ VẬN HÀNH}{33}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Yêu cầu cấu hình hệ thống}{33}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Quy trình triển khai và khởi chạy hệ thống}{33}{section.B.2}%
+\contentsline {subsection}{\numberline {B.2.1}Bước 1: Cấu hình biến môi trường và nạp dữ liệu cơ sở dữ liệu}{33}{subsection.B.2.1}%
+\contentsline {subsection}{\numberline {B.2.2}Bước 2: Tải mô hình và đóng gói trên máy chủ Ollama}{34}{subsection.B.2.2}%
+\contentsline {subsection}{\numberline {B.2.3}Bước 3: Khởi chạy đồng thời máy chủ API và giao diện ứng dụng}{34}{subsection.B.2.3}%
+\contentsline {chapter}{\numberline {C}CẤU HÌNH SIÊU THAM SỐ VÀ DỮ LIỆU THỰC NGHIỆM}{35}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Bảng tổng hợp cấu hình siêu tham số mô hình}{35}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Mẫu dữ liệu phản hồi trích xuất dinh dưỡng định dạng JSON}{36}{section.C.2}%
+\contentsfinish 

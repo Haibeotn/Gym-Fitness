@@ -1,0 +1,61 @@
+% ==============================================================================
+% PHỤ LỤC B: HƯỚNG DẪN CÀI ĐẶT VÀ VẬN HÀNH
+% ==============================================================================
+
+\chapter{HƯỚNG DẪN CÀI ĐẶT VÀ VẬN HÀNH}
+\label{app:installation}
+
+\section{Yêu cầu cấu hình hệ thống}
+
+Để triển khai và vận hành đầy đủ các phân hệ của ứng dụng, môi trường thực thi cần đáp ứng các điều kiện tiêu chuẩn sau:
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Hệ điều hành tương thích:} Windows 10 hoặc Windows 11 phiên bản 64-bit, Ubuntu Linux 20.04 LTS trở lên hoặc macOS.
+    \item \textbf{Môi trường thực thi mã nguồn:} Node.js phiên bản 18 LTS hoặc 20 LTS, trình quản lý gói npm phiên bản 9.0 trở lên.
+    \item \textbf{Hệ quản trị cơ sở dữ liệu:} PostgreSQL phiên bản 14 trở lên đang mở dịch vụ tại cổng mặc định 5432.
+    \item \textbf{Hạ tầng trí tuệ nhân tạo cục bộ:} Công cụ Ollama đã được cài đặt, bộ nhớ RAM khả dụng tối thiểu 8 GB.
+\end{itemize}
+
+\section{Quy trình triển khai và khởi chạy hệ thống}
+
+\subsection{Bước 1: Cấu hình biến môi trường và nạp dữ liệu cơ sở dữ liệu}
+Khởi tạo cơ sở dữ liệu PostgreSQL mang tên \texttt{fitness\_db}. Tạo tệp cấu hình \texttt{.env} bên trong thư mục \texttt{fitness-ai-backend} với các thông số kết nối cơ sở dữ liệu, khóa bí mật JWT và khóa truy cập Google Gemini API. Sau đó mở cửa sổ dòng lệnh và thực thi các câu lệnh cài đặt:
+
+\begin{lstlisting}[language=bash, caption={Lệnh cài đặt gói phụ thuộc và nạp dữ liệu nền tảng cho máy chủ}]
+cd fitness-ai-backend
+npm install
+
+# Khoi tao 19 bang du lieu quan he
+node scripts/initDb.js
+
+# Nap danh muc bai tap co sinh hoc va tri thuc thuc pham Viet
+node scripts/seedEnrichedExercises.js
+node scripts/seedEnrichedData.js
+\end{lstlisting}
+
+\subsection{Bước 2: Tải mô hình và đóng gói trên máy chủ Ollama}
+Mở một cửa sổ dòng lệnh độc lập để tải các mô hình mã nguồn mở nền tảng và khởi tạo mô hình tùy biến từ các tệp cấu hình có sẵn:
+
+\begin{lstlisting}[language=bash, caption={Lệnh thiet lap mo hinh tro ly ao va thi giac tren Ollama}]
+ollama pull qwen2.5:3b
+ollama pull llava
+
+# Dong goi mo hinh tro ly ao va mo hinh thi giac mon an
+ollama create fitness-ai-coach -f Modelfile
+ollama create fitness-vision-food -f Modelfile.vision
+\end{lstlisting}
+
+\subsection{Bước 3: Khởi chạy đồng thời máy chủ API và giao diện ứng dụng}
+Khởi chạy dịch vụ máy chủ tại cửa sổ dòng lệnh thứ nhất và giao diện người dùng tại cửa sổ dòng lệnh thứ hai:
+
+\begin{lstlisting}[language=bash, caption={Khoi chay may chu Backend va ung dung giao dien}]
+# Cua so 1: Khoi chay may chu Express RESTful API tai cong 5000
+cd fitness-ai-backend
+npm start
+
+# Cua so 2: Khoi chay may chu phat trien giao dien React Vite tai cong 5173
+cd fitness-ai-frontend
+npm install
+npm run dev
+\end{lstlisting}
+
+Sau khi hai tiến trình khởi chạy thành công, người dùng truy cập trình duyệt Web tại địa chỉ \url{http://localhost:5173} để bắt đầu trải nghiệm toàn bộ các tính năng của hệ thống.

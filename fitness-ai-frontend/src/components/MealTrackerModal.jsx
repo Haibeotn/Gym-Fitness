@@ -1,6 +1,7 @@
 // src/components/MealTrackerModal.jsx
-import React, { useState, useEffect } from 'react';
-import { fetchDailyMeals, addMealLog, deleteMealLog, fetchFoodSuggestions } from '../services/api';
+import React, { useState, useEffect, useRef } from 'react';
+import { fetchDailyMeals, addMealLog, deleteMealLog, fetchFoodSuggestions, analyzeFoodImage } from '../services/api';
+import { Camera, Upload, Sparkles, CheckCircle2, RefreshCw } from 'lucide-react';
 
 export default function MealTrackerModal({ isOpen, onClose, targetNutrition = {}, onMealsUpdated }) {
     const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -11,7 +12,15 @@ export default function MealTrackerModal({ isOpen, onClose, targetNutrition = {}
     const [activeMealType, setActiveMealType] = useState(null); // 'breakfast' | 'lunch' | 'dinner' | 'snack'
     const [foodSuggestions, setFoodSuggestions] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [isCustomMode, setIsCustomMode] = useState(false);
+    const [addMode, setAddMode] = useState('library'); // 'library' | 'ai_scan' | 'custom'
+
+    // AI Food Scanner State
+    const fileInputRef = useRef(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [imageMimeType, setImageMimeType] = useState('image/jpeg');
+    const [aiHintText, setAiHintText] = useState('');
+    const [analyzingImage, setAnalyzingImage] = useState(false);
+    const [aiScanResult, setAiScanResult] = useState(null);
 
     // Custom Form State
     const [customFoodName, setCustomFoodName] = useState('');
@@ -68,6 +77,59 @@ export default function MealTrackerModal({ isOpen, onClose, targetNutrition = {}
 
     if (!isOpen) return null;
 
+    const resetScannerState = () => {
+        setImagePreview(null);
+        setAiHintText('');
+        setAiScanResult(null);
+        setAnalyzingImage(false);
+    };
+
+    const handleImageFileChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setImageMimeType(file.type || 'image/jpeg');
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            setImagePreview(event.target.result);
+            setAiScanResult(null);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleAnalyzeFoodImage = async () => {
+        if (!imagePreview && !aiHintText.trim()) {
+            alert('Vui lòng chọn ảnh bữa ăn hoặc nhập tên/mô tả món ăn để AI phân tích.');
+            return;
+        }
+        setAnalyzingImage(true);
+        try {
+            const res = await analyzeFoodImage({
+                imageBase64: imagePreview,
+                mimeType: imageMimeType,
+                hintText: aiHintText.trim()
+            });
+
+            if (res.success && res.analysis) {
+                setAiScanResult(res.analysis);
+                // Điền sẵn vào state để người dùng có thể chỉnh sửa trực tiếp nếu muốn
+                setCustomFoodName(res.analysis.food_name || 'Món ăn quét AI');
+                setCustomCalories(String(res.analysis.calories || 0));
+                setCustomProtein(String(res.analysis.protein || 0));
+                setCustomCarbs(String(res.analysis.carbs || 0));
+                setCustomFat(String(res.analysis.fat || 0));
+                setCustomServing(res.analysis.serving_size || '1 phần');
+                setCustomNotes(res.analysis.health_tip || '');
+            } else {
+                alert(res.message || 'Không thể phân tích hình ảnh.');
+            }
+        } catch (err) {
+            alert(err.response?.data?.message || 'Lỗi kết nối AI Vision Scanner.');
+        } finally {
+            setAnalyzingImage(false);
+        }
+    };
+
     const handleAddPresetFood = async (food) => {
         if (!activeMealType) return;
         setSubmitting(true);
@@ -98,7 +160,7 @@ export default function MealTrackerModal({ isOpen, onClose, targetNutrition = {}
     };
 
     const handleAddCustomFood = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         if (!customFoodName.trim()) {
             alert('Vui lòng nhập tên món ăn.');
             return;
@@ -120,7 +182,8 @@ export default function MealTrackerModal({ isOpen, onClose, targetNutrition = {}
             if (res.success) {
                 showToast(`✅ Đã thêm "${customFoodName}" thành công!`);
                 setActiveMealType(null);
-                setIsCustomMode(false);
+                setAddMode('library');
+                resetScannerState();
                 setCustomFoodName('');
                 setCustomCalories('');
                 setCustomProtein('');
@@ -183,10 +246,10 @@ export default function MealTrackerModal({ isOpen, onClose, targetNutrition = {}
                         </div>
                         <div>
                             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                                Nhật Ký Bữa Ăn &amp; Theo Dõi Macro
+                                Nhật Ký Bữa Ăn &amp; AI Food Scanner
                             </h3>
                             <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-0.5">
-                                Kiểm soát Calo và 3 chỉ số Macro (Đạm, Đường bột, Chất béo) khớp với phác đồ AI.
+                                Quét ảnh món ăn bằng Gemini Vision AI hoặc tra cứu thư viện để kiểm soát Calo &amp; 3 chỉ số Macro.
                             </p>
                         </div>
                     </div>
@@ -362,18 +425,34 @@ export default function MealTrackerModal({ isOpen, onClose, targetNutrition = {}
                                             </div>
                                         </div>
 
-                                        <button
-                                            onClick={() => {
-                                                setActiveMealType(category.type);
-                                                setIsCustomMode(false);
-                                                setSearchQuery('');
-                                                loadSuggestions('');
-                                            }}
-                                            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm sm:text-base font-black rounded-2xl transition cursor-pointer flex items-center justify-center gap-2 shadow-md hover:shadow-emerald-500/25 active:scale-95 shrink-0 self-start sm:self-center"
-                                        >
-                                            <span className="text-lg leading-none">+</span>
-                                            <span>Thêm món</span>
-                                        </button>
+                                        <div className="flex items-center gap-2.5 self-start sm:self-center">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setActiveMealType(category.type);
+                                                    setAddMode('ai_scan');
+                                                    resetScannerState();
+                                                }}
+                                                className="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs sm:text-sm font-black rounded-2xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md hover:shadow-indigo-500/25 active:scale-95 shrink-0"
+                                            >
+                                                <Camera className="w-4 h-4" />
+                                                <span>Quét ảnh AI</span>
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setActiveMealType(category.type);
+                                                    setAddMode('library');
+                                                    setSearchQuery('');
+                                                    loadSuggestions('');
+                                                }}
+                                                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-black rounded-2xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md hover:shadow-emerald-500/25 active:scale-95 shrink-0"
+                                            >
+                                                <span className="text-base leading-none">+</span>
+                                                <span>Thêm món</span>
+                                            </button>
+                                        </div>
                                     </div>
 
                                     {/* Items List */}
@@ -439,7 +518,7 @@ export default function MealTrackerModal({ isOpen, onClose, targetNutrition = {}
                                         <span className="text-emerald-500">➕</span> Thêm Món Vào {MEAL_CATEGORIES.find(c => c.type === activeMealType)?.title}
                                     </h4>
                                     <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-1">
-                                        Chọn từ món gợi ý hoặc tạo món tùy chỉnh theo bữa ăn của bạn
+                                        Quét ảnh món ăn bằng AI, chọn từ thư viện hoặc tự nhập khẩu phần
                                     </p>
                                 </div>
                                 <button
@@ -450,27 +529,39 @@ export default function MealTrackerModal({ isOpen, onClose, targetNutrition = {}
                                 </button>
                             </div>
 
-                            {/* Mode Toggle */}
-                            <div className="flex gap-2 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
+                            {/* 3-Mode Toggle */}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
                                 <button
-                                    onClick={() => setIsCustomMode(false)}
-                                    className={`flex-1 py-3 rounded-xl text-sm sm:text-base font-extrabold transition cursor-pointer flex items-center justify-center gap-2 ${
-                                        !isCustomMode ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                                    type="button"
+                                    onClick={() => setAddMode('library')}
+                                    className={`py-3 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition cursor-pointer flex items-center justify-center gap-2 ${
+                                        addMode === 'library' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                                     }`}
                                 >
-                                    <span>🥗</span> Thư Viện Món Ăn Phổ Biến
+                                    <span>🥗</span> Thư Viện Món Ăn
                                 </button>
                                 <button
-                                    onClick={() => setIsCustomMode(true)}
-                                    className={`flex-1 py-3 rounded-xl text-sm sm:text-base font-extrabold transition cursor-pointer flex items-center justify-center gap-2 ${
-                                        isCustomMode ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                                    type="button"
+                                    onClick={() => setAddMode('ai_scan')}
+                                    className={`py-3 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition cursor-pointer flex items-center justify-center gap-2 ${
+                                        addMode === 'ai_scan' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                                     }`}
                                 >
-                                    <span>✍️</span> Tự Nhập Món Tùy Chỉnh
+                                    <Camera className="w-4 h-4" /> Quét Ảnh AI Vision
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setAddMode('custom')}
+                                    className={`py-3 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition cursor-pointer flex items-center justify-center gap-2 ${
+                                        addMode === 'custom' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    <span>✍️</span> Tự Nhập Tùy Chỉnh
                                 </button>
                             </div>
 
-                            {!isCustomMode ? (
+                            {/* TAB 1: THƯ VIỆN MÓN ĂN */}
+                            {addMode === 'library' && (
                                 <div className="space-y-4">
                                     {/* Search input */}
                                     <div className="relative">
@@ -554,16 +645,6 @@ export default function MealTrackerModal({ isOpen, onClose, targetNutrition = {}
                                                         <span className="text-xs sm:text-sm text-amber-600 dark:text-amber-400 font-extrabold">• Carb: {food.carbs}g</span>
                                                         <span className="text-xs sm:text-sm text-rose-600 dark:text-rose-400 font-extrabold">• Béo: {food.fat}g</span>
                                                     </div>
-
-                                                    {food.tags && Array.isArray(food.tags) && food.tags.length > 0 && (
-                                                        <div className="flex flex-wrap gap-1.5 pt-1">
-                                                            {food.tags.map((tag, tIdx) => (
-                                                                <span key={tIdx} className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 px-2.5 py-0.5 rounded-md">
-                                                                    #{tag}
-                                                                </span>
-                                                            ))}
-                                                        </div>
-                                                    )}
                                                 </div>
 
                                                 <button
@@ -578,12 +659,248 @@ export default function MealTrackerModal({ isOpen, onClose, targetNutrition = {}
 
                                         {foodSuggestions.length === 0 && (
                                             <p className="text-sm sm:text-base text-slate-400 dark:text-slate-500 text-center py-8">
-                                                Không tìm thấy món phù hợp. Hãy chuyển sang tab "Tự Nhập Món Tùy Chỉnh".
+                                                Không tìm thấy món phù hợp. Hãy thử tab "Quét Ảnh AI Vision" hoặc "Tự Nhập Tùy Chỉnh".
                                             </p>
                                         )}
                                     </div>
                                 </div>
-                            ) : (
+                            )}
+
+                            {/* TAB 2: QUÉT ẢNH MÓN ĂN BẰNG AI (GEMINI MULTIMODAL VISION) */}
+                            {addMode === 'ai_scan' && (
+                                <div className="space-y-5">
+                                    {/* Khu vực tải ảnh / chụp ảnh */}
+                                    <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+                                        <div className="md:col-span-5 space-y-3">
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept="image/*"
+                                                capture="environment"
+                                                onChange={handleImageFileChange}
+                                                className="hidden"
+                                            />
+
+                                            <div
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="border-2 border-dashed border-indigo-300 dark:border-indigo-700/70 hover:border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/20 rounded-3xl p-4 min-h-[220px] flex flex-col items-center justify-center text-center cursor-pointer transition relative overflow-hidden group"
+                                            >
+                                                {imagePreview ? (
+                                                    <div className="w-full h-full flex flex-col items-center">
+                                                        <img
+                                                            src={imagePreview}
+                                                            alt="Food preview"
+                                                            className="max-h-52 w-auto rounded-2xl object-cover shadow-md"
+                                                        />
+                                                        <span className="mt-2.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                                                            <RefreshCw className="w-3.5 h-3.5" /> Nhấn để đổi bức ảnh khác
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="space-y-2.5 p-4">
+                                                        <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto group-hover:scale-110 transition">
+                                                            <Upload className="w-7 h-7" />
+                                                        </div>
+                                                        <p className="font-black text-slate-800 dark:text-slate-100 text-sm sm:text-base">
+                                                            Chụp ảnh hoặc tải ảnh đĩa thức ăn lên
+                                                        </p>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                            Hỗ trợ JPG, PNG, WEBP. AI sẽ nhận diện từng thành phần trong đĩa.
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">
+                                                    Tên món / Định lượng chi tiết (Giúp AI bóc tách chi tiết tới từng gram):
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="VD: 200g ức gà + 1 chén cơm gạo lứt + 2 quả trứng luộc, hoặc Cơm tấm sườn bì chả..."
+                                                    value={aiHintText}
+                                                    onChange={(e) => setAiHintText(e.target.value)}
+                                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs sm:text-sm px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-indigo-500 font-medium"
+                                                />
+                                                <div className="flex flex-wrap gap-1.5 mt-2">
+                                                    {[
+                                                        'Cơm tấm sườn bì chả',
+                                                        'Phở bò tái nạm',
+                                                        '200g ức gà + 1 chén cơm gạo lứt + súp lơ',
+                                                        'Bún bò Huế',
+                                                        '150g cá hồi + 200g khoai lang + 2 quả trứng luộc',
+                                                        'Bánh mì thịt chả pate'
+                                                    ].map(sample => (
+                                                        <button
+                                                            key={sample}
+                                                            type="button"
+                                                            onClick={() => setAiHintText(sample)}
+                                                            className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60 hover:bg-indigo-100 transition cursor-pointer"
+                                                        >
+                                                            + {sample}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                disabled={analyzingImage}
+                                                onClick={handleAnalyzeFoodImage}
+                                                className="w-full py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-lg transition cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60 active:scale-95"
+                                            >
+                                                {analyzingImage ? (
+                                                    <>
+                                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                        <span>AI Vision đang bóc tách Calo...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Sparkles className="w-5 h-5" />
+                                                        <span>Phân Tích Dinh Dưỡng Bằng AI</span>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+
+                                        {/* Kết quả phân tích từ AI */}
+                                        <div className="md:col-span-7">
+                                            {aiScanResult ? (
+                                                <div className="bg-slate-50 dark:bg-slate-800/70 border border-indigo-200 dark:border-indigo-900/60 rounded-3xl p-5 space-y-4 animate-fadeIn">
+                                                    <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                                                            <span className="font-black text-sm sm:text-base text-slate-900 dark:text-white">
+                                                                Kết Quả Bóc Tách Từ AI Vision
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20">
+                                                            Độ tin cậy: {aiScanResult.confidence || 92}%
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Các thành phần phát hiện trên đĩa */}
+                                                    {aiScanResult.items_detected?.length > 0 && (
+                                                        <div className="space-y-1.5">
+                                                            <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                                                Thành phần phát hiện trong khẩu phần:
+                                                            </p>
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                                {aiScanResult.items_detected.map((sub, i) => (
+                                                                    <div key={i} className="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700/70 text-xs flex justify-between items-center">
+                                                                        <div>
+                                                                            <p className="font-bold text-slate-800 dark:text-slate-200">{sub.name}</p>
+                                                                            <p className="text-[11px] text-slate-400">~{sub.weight_g || 100}g • P:{sub.protein}g C:{sub.carbs}g F:{sub.fat}g</p>
+                                                                        </div>
+                                                                        <span className="font-black text-emerald-600 dark:text-emerald-400">{sub.calories} kcal</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Form xác nhận/hiệu chỉnh nhanh trước khi lưu */}
+                                                    <div className="space-y-3 pt-1">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                                            <div className="sm:col-span-2">
+                                                                <label className="block text-xs font-bold text-slate-500 mb-1">Tên món ăn</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={customFoodName}
+                                                                    onChange={(e) => setCustomFoodName(e.target.value)}
+                                                                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-3 py-2 rounded-xl text-sm font-bold"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs font-bold text-slate-500 mb-1">Định lượng</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={customServing}
+                                                                    onChange={(e) => setCustomServing(e.target.value)}
+                                                                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-3 py-2 rounded-xl text-sm font-bold"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="grid grid-cols-4 gap-2">
+                                                            <div className="bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800/50">
+                                                                <label className="block text-[11px] font-bold text-emerald-700 dark:text-emerald-400">Calo (kcal)</label>
+                                                                <input
+                                                                    type="number"
+                                                                    value={customCalories}
+                                                                    onChange={(e) => setCustomCalories(e.target.value)}
+                                                                    className="w-full bg-transparent font-black text-base text-emerald-700 dark:text-emerald-300 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                            <div className="bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-xl border border-blue-200 dark:border-blue-800/50">
+                                                                <label className="block text-[11px] font-bold text-blue-700 dark:text-blue-400">Đạm (g)</label>
+                                                                <input
+                                                                    type="number"
+                                                                    step="0.1"
+                                                                    value={customProtein}
+                                                                    onChange={(e) => setCustomProtein(e.target.value)}
+                                                                    className="w-full bg-transparent font-black text-base text-blue-700 dark:text-blue-300 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                            <div className="bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200 dark:border-amber-800/50">
+                                                                <label className="block text-[11px] font-bold text-amber-700 dark:text-amber-400">Carbs (g)</label>
+                                                                <input
+                                                                    type="number"
+                                                                    step="0.1"
+                                                                    value={customCarbs}
+                                                                    onChange={(e) => setCustomCarbs(e.target.value)}
+                                                                    className="w-full bg-transparent font-black text-base text-amber-700 dark:text-amber-300 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                            <div className="bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-xl border border-rose-200 dark:border-rose-800/50">
+                                                                <label className="block text-[11px] font-bold text-rose-700 dark:text-rose-400">Fat (g)</label>
+                                                                <input
+                                                                    type="number"
+                                                                    step="0.1"
+                                                                    value={customFat}
+                                                                    onChange={(e) => setCustomFat(e.target.value)}
+                                                                    className="w-full bg-transparent font-black text-base text-rose-700 dark:text-rose-300 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        {aiScanResult.health_tip && (
+                                                            <div className="bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/70 dark:border-indigo-800/50 p-3 rounded-xl text-xs text-indigo-900 dark:text-indigo-200 flex items-start gap-2">
+                                                                <span className="text-base">💡</span>
+                                                                <span><strong>Nhận xét từ AI Coach:</strong> {aiScanResult.health_tip}</span>
+                                                            </div>
+                                                        )}
+
+                                                        <button
+                                                            type="button"
+                                                            disabled={submitting}
+                                                            onClick={handleAddCustomFood}
+                                                            className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-lg transition cursor-pointer active:scale-95"
+                                                        >
+                                                            {submitting ? 'Đang lưu...' : '✅ Xác Nhận Lưu Vào Nhật Ký Bữa Ăn'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="h-full min-h-[260px] bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 rounded-3xl p-6 flex flex-col items-center justify-center text-center space-y-3">
+                                                    <div className="w-16 h-16 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-3xl">
+                                                        📸
+                                                    </div>
+                                                    <h5 className="font-black text-base sm:text-lg text-slate-800 dark:text-slate-200">
+                                                        AI Smart Food Scanner
+                                                    </h5>
+                                                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed">
+                                                        Tải lên hình ảnh mâm cơm, tô phở, hộp ức gà hoặc bất kỳ món ăn nào. AI sẽ tự động ước lượng khối lượng (gram), tổng Calo và tỷ lệ Đạm / Đường bột / Chất béo.
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* TAB 3: TỰ NHẬP MÓN TÙY CHỈNH */}
+                            {addMode === 'custom' && (
                                 <form onSubmit={handleAddCustomFood} className="space-y-4 text-sm sm:text-base">
                                     <div>
                                         <label className="block text-slate-700 dark:text-slate-200 font-black mb-1.5">

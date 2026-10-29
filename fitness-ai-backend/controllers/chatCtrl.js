@@ -177,9 +177,9 @@ exports.askLocalAiCoach = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Vui lòng cung cấp nội dung câu hỏi.' });
         }
 
-        // Lấy thông tin thể trạng học viên trong Database để làm ngữ cảnh
+        // Lấy thông tin thể trạng & chấn thương học viên trong Database để làm ngữ cảnh
         const userRes = await pool.query(`
-            SELECT id, full_name, email, age, height, weight, goal, activity_level, role 
+            SELECT id, full_name, email, gender, age, height, weight, goal, activity_level, injuries, role 
             FROM users 
             WHERE id = $1;
         `, [userId]);

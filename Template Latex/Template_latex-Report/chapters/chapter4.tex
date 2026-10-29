@@ -1,0 +1,174 @@
+% ==============================================================================
+% CHƯƠNG 4: TRIỂN KHAI VÀ THỰC NGHIỆM
+% ==============================================================================
+
+\chapter{TRIỂN KHAI VÀ THỰC NGHIỆM}
+\label{chap:trienkhai}
+
+\section{Môi trường cài đặt và công cụ thực nghiệm}
+\label{sec:moitruong}
+
+Quá trình lập trình, tinh chỉnh mô hình và kiểm thử hệ thống được tiến hành trên môi trường phần cứng và hạ tầng phần mềm đồng nhất:
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Cấu hình máy chủ phát triển cục bộ:} Bộ xử lý trung tâm đa nhân xung nhịp $3.6\text{ GHz}$, bộ nhớ RAM dung lượng $16\text{ GB}$, card đồ họa rời hỗ trợ tăng tốc phần cứng $6\text{ GB}$ VRAM, cài đặt hệ điều hành Windows 11 phiên bản 64-bit.
+    \item \textbf{Môi trường huấn luyện mô hình đa phương thức:} Tận dụng hạ tầng GPU với thư viện Unsloth, Hugging Face Transformers và PEFT phiên bản 0.21.2 để tinh chỉnh adapter LoRA trên nền mô hình Qwen2-VL-7B lượng tử hóa 4-bit.
+    \item \textbf{Nền tảng thực thi và lưu trữ:} Node.js phiên bản 20 LTS, hệ quản trị cơ sở dữ liệu PostgreSQL phiên bản 16, máy chủ suy luận cục bộ Ollama và giao diện lập trình ứng dụng Google Gemini API.
+\end{itemize}
+
+\section{Xây dựng tập dữ liệu và tinh chỉnh mô hình}
+\label{sec:huanluyen}
+
+\subsection{Xây dựng dữ liệu bài tập cơ sinh học và tri thức dinh dưỡng ẩm thực Việt}
+\label{subsec:chuanbi_dulieu}
+
+Để mô hình trí tuệ nhân tạo và bộ truy xuất dữ liệu phản hồi chuẩn xác theo thể trạng người Việt, đề tài tiến hành thu thập, làm sạch và cấu trúc hóa hai tập dữ liệu chuyên biệt:
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Tập dữ liệu bài tập và phân loại giải phẫu:} Xây dựng danh mục hơn 50 bài tập thể hình cốt lõi bao phủ toàn diện các nhóm cơ ngực, lưng, vai, tay, đùi trước, đùi sau, mông và cơ lõi. Mỗi bài tập đều được gán nhãn thuộc tính phân loại động tác đa khớp hoặc cô lập, thiết bị yêu cầu từ mức tập tự do không dụng cụ đến tạ đơn, tạ đòn, máy kéo cáp, cùng các quy tắc loại trừ chống chỉ định nghiêm ngặt đối với bốn nhóm bệnh lý khớp gối, cột sống thắt lưng, khớp vai và cổ tay.
+    \item \textbf{Tập dữ liệu dinh dưỡng món ăn Việt Nam:} Chuẩn hóa bảng dữ liệu dinh dưỡng cho hơn 300 món ăn phổ biến trong bữa ăn hàng ngày tại Việt Nam như phở bò, cơm tấm sườn nướng, bún chả, ức gà luộc, trứng ốp la, thịt bò xào và các món canh rau. Mỗi món ăn được định lượng chi tiết theo đơn vị gram và mililit, tính toán sẵn lượng năng lượng cùng ba thành phần đa lượng Protein, Carbohydrate và Fat.
+    \item \textbf{Tập dữ liệu câu hỏi và câu trả lời huấn luyện:} Sinh tự động chuỗi dữ liệu hội thoại chuyên gia theo định dạng JSONL thông qua kịch bản lập trình, mô phỏng các tình huống hỏi đáp về kỹ thuật nâng tạ, xử lý khi máy tập bị chiếm và hướng dẫn dinh dưỡng theo từng giai đoạn tăng cơ hay giảm mỡ.
+\end{enumerate}
+
+\subsection{Tinh chỉnh mô hình nhận diện thực phẩm và cấu hình Modelfile trên Ollama}
+\label{subsec:finetune_ollama}
+
+Mô hình thị giác thực phẩm được tinh chỉnh từ kiến trúc gốc Qwen2-VL-7B sử dụng kỹ thuật LoRA với các tham số $r = 16$, $\alpha = 16$ và hệ số rơi trọng số bằng 0. Trọng số adapter sau khi huấn luyện hội tụ được tích hợp vào luồng suy luận để trích xuất thông tin khẩu phần món ăn dưới dạng đối tượng JSON có cấu trúc rõ ràng.
+
+Đồng thời, trên máy chủ suy luận cục bộ Ollama, hệ thống cấu hình tệp Modelfile chuyên biệt nhằm cố định phong cách hướng dẫn chuẩn y học thể thao cho trợ lý ảo, thiết lập nhiệt độ lấy mẫu thấp để đảm bảo câu trả lời luôn nhất quán và không phát sinh nội dung sai lệch như thể hiện tại \cref{lst:modelfile_sample}.
+
+\begin{lstlisting}[language=bash, caption={Cấu hình Modelfile cho mô hình trợ lý ảo trên máy chủ Ollama}, label={lst:modelfile_sample}]
+FROM qwen2.5:3b
+
+PARAMETER temperature 0.25
+PARAMETER top_p 0.85
+PARAMETER repeat_penalty 1.18
+
+SYSTEM """Bạn là chuyên gia khoa học thể thao và huấn luyện viên thể hình cá nhân.
+Cấu trúc một giáo án tập luyện bắt buộc gồm 3 phần:
+1. Phân tích cơ sinh học và nguyên tắc an toàn chấn thương.
+2. Giáo án tập luyện chi tiết 4 đến 6 bài tập tối ưu kèm số hiệp, số lần lặp và chỉ số RPE.
+3. Hướng dẫn phục hồi và dinh dưỡng sau tập."""
+\end{lstlisting}
+
+\section{Hiện thực hóa các phân hệ chức năng chính}
+\label{sec:hienthuchoa}
+
+\subsection{Phân hệ khảo sát thể trạng và thiết kế giáo án thông minh}
+\label{subsec:impl_workout}
+
+Phân hệ khảo sát thể trạng Onboarding dẫn dắt hội viên khai báo tuần tự các thông số hình thể và tiền sử xương khớp. Sau khi tiếp nhận dữ liệu, hệ thống tự động tính toán chính xác chỉ số BMR, TDEE và mục tiêu calo hàng ngày. Giao diện bảng điều khiển trung tâm hiển thị trực quan tỷ lệ phân bổ ba nhóm chất dinh dưỡng và cho phép hội viên mở phân hệ thiết kế giáo án.
+
+Tại đây, thuật toán lọc bài tập phối hợp cùng mô hình ngôn ngữ sẽ đề xuất buổi tập bốn pha tối ưu. Trong quá trình tập luyện thực tế, giao diện hỗ trợ chế độ tập trực tiếp với thanh công cụ điều phối âm thanh, phát giọng đọc nhắc nhở thời gian giữ nhịp độ chuyển động và đếm ngược thời gian nghỉ phục hồi giữa các hiệp tập.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}
+    % Khung tổng thể Dashboard (x từ 0.0 đến 19.6)
+    \draw[thick, draw=academicblue, fill=white, rounded corners=5pt] (0.0, 0.0) rectangle (19.6, 7.0);
+    \fill[academicblue] (0.0, 6.15) rectangle (19.6, 7.0);
+    \node[text=white, font=\bfseries\small] at (9.8, 6.57) {BẢNG ĐIỀU KHIỂN HỘI VIÊN: TỔNG QUAN DINH DƯỠNG VÀ GIÁO ÁN BỐN PHA};
+
+    % Thẻ 1: Chỉ số năng lượng (x từ 0.5 đến 6.3, rộng 5.8cm)
+    \draw[thick, draw=academicblue, fill=codebg, rounded corners=4pt] (0.5, 3.7) rectangle (6.3, 5.75);
+    \fill[academicblue] (0.5, 5.15) rectangle (6.3, 5.75);
+    \node[font=\bfseries\scriptsize, text=white] at (3.4, 5.45) {1. CHỈ SỐ NĂNG LƯỢNG};
+    \node[font=\scriptsize] at (3.4, 4.65) {BMR: 1,680 kcal | TDEE: 2,350 kcal};
+    \node[font=\scriptsize, text=codegreen] at (3.4, 4.05) {Mục tiêu giảm mỡ: 1,850 kcal};
+
+    % Thẻ 2: Phân bổ Macros (x từ 6.9 đến 12.7, rộng 5.8cm)
+    \draw[thick, draw=academicblue, fill=codebg, rounded corners=4pt] (6.9, 3.7) rectangle (12.7, 5.75);
+    \fill[academicblue] (6.9, 5.15) rectangle (12.7, 5.75);
+    \node[font=\bfseries\scriptsize, text=white] at (9.8, 5.45) {2. DƯỠNG CHẤT ĐA LƯỢNG};
+    \node[font=\scriptsize] at (9.8, 4.65) {Protein: 154 g --- định mức 2.2 g/kg};
+    \node[font=\scriptsize] at (9.8, 4.05) {Carbohydrate: 180 g | Fat: 51 g};
+
+    % Thẻ 3: Gói tập & PT (x từ 13.3 đến 19.1, rộng 5.8cm)
+    \draw[thick, draw=academicblue, fill=codebg, rounded corners=4pt] (13.3, 3.7) rectangle (19.1, 5.75);
+    \fill[academicblue] (13.3, 5.15) rectangle (19.1, 5.75);
+    \node[font=\bfseries\scriptsize, text=white] at (16.2, 5.45) {3. GÓI TẬP \& PT PHỤ TRÁCH};
+    \node[font=\scriptsize] at (16.2, 4.65) {Gói 12 buổi kèm PT cá nhân};
+    \node[font=\scriptsize, text=codepurple] at (16.2, 4.05) {Số dư: 9 buổi | Trạng thái: Đã duyệt};
+
+    % Khu vực giáo án 4 pha (x từ 0.5 đến 19.1, rộng 18.6cm)
+    \draw[thick, draw=academicblue, fill=codebg, rounded corners=4pt] (0.5, 0.4) rectangle (19.1, 3.3);
+    \fill[academicblue] (0.5, 2.7) rectangle (19.1, 3.3);
+    \node[font=\bfseries\scriptsize, text=white] at (9.8, 3.0) {CẤU TRÚC GIÁO ÁN BỐN PHA --- SÀNG LỌC AN TOÀN KHỚP VAI};
+    \node[font=\scriptsize, anchor=west] at (1.0, 2.25) {$\bullet$ \textbf{Pha 1:} Dumbbell Floor Press --- 4 hiệp $\times$ 8 lần lặp, chỉ số RPE 8.0, nhịp độ Tempo 3-0-1-0};
+    \node[font=\scriptsize, anchor=west] at (1.0, 1.55) {$\bullet$ \textbf{Pha 2:} Neutral-Grip Incline Dumbbell Press --- 3 hiệp $\times$ 10 lần lặp, chỉ số RPE 8.0};
+    \node[font=\scriptsize, anchor=west] at (1.0, 0.85) {$\bullet$ \textbf{Pha 3:} Standing Cable Chest Fly --- 3 hiệp $\times$ 12 lần lặp \quad | \quad \textbf{Pha 4:} Plank gồng cơ lõi --- 3 hiệp};
+\end{tikzpicture}%
+}
+\caption{Minh họa giao diện tổng quan dinh dưỡng và cấu trúc giáo án bốn pha}
+\label{fig:ui_dashboard_workout}
+\end{figure}
+
+\subsection{Phân hệ quét ảnh thực phẩm và trợ lý hội thoại RAG Chat}
+\label{subsec:impl_vision_rag}
+
+Phân hệ nhận diện dinh dưỡng cho phép hội viên tải ảnh chụp đĩa thức ăn trực tiếp từ điện thoại. Khi ảnh được gửi lên máy chủ, bộ gác cổng thị giác tiến hành nhận diện miền ảnh. Nếu người dùng vô tình tải lên ảnh dụng cụ thể hình, máy tính sẽ phản hồi thông báo ảnh thuộc danh mục tập luyện; nếu ảnh không liên quan đến ẩm thực hay thể thao, hệ thống gửi phản hồi từ chối lịch sự và đề nghị chụp lại món ăn.
+
+Khi ảnh hợp lệ, mô hình thị giác bóc tách danh mục nguyên liệu hiển thị trên đĩa và ước tính trọng lượng gram tương ứng. Kết quả sau đó được đối chiếu với bảng thành phần dinh dưỡng để hiển thị tổng calo cùng biểu đồ phân bổ Protein, Carbohydrate, Fat và tự động lưu vào nhật ký ăn uống trong ngày. Song song với đó, khung trò chuyện trợ lý ảo ứng dụng kỹ thuật RAG cho phép người dùng hỏi đáp trực tiếp các thắc mắc về kỹ thuật nâng tạ và phương pháp phục hồi cơ bắp.
+
+\subsection{Phân hệ đặt lịch hẹn, phê duyệt giáo án và quản trị hệ thống}
+\label{subsec:impl_pt_admin}
+
+Tại không gian làm việc của huấn luyện viên, PT có thể theo dõi danh sách toàn bộ hội viên được phòng tập phân bổ. Khi người tập tạo mới hoặc yêu cầu cập nhật bài tập, giáo án xuất hiện trên màn hình chờ duyệt của PT kèm theo ghi chú phân tích lý do của máy tính. PT có toàn quyền thay đổi số hiệp, điều chỉnh mức tạ khởi điểm hoặc đổi bài tập trước khi bấm nút xác nhận.
+
+Sau khi giáo án được duyệt, hội viên mở phân hệ đặt lịch để chọn ca tập 60 phút phù hợp với thời gian biểu của PT. Hệ thống tự động thiết lập khoảng cách an toàn 15 phút giữa hai buổi tập liên tiếp để tránh trùng lặp. Khi buổi tập diễn ra, hội viên xuất trình mã QR trên ứng dụng để PT quét xác nhận điểm danh, đảm bảo tính minh bạch trong việc trừ số buổi tập của gói dịch vụ. Tại bảng điều khiển quản trị, Admin có thể thống kê doanh thu, tỷ lệ hoàn thành ca tập và tình trạng tải của từng huấn luyện viên.
+
+\section{Kết quả thực nghiệm và đánh giá hệ thống}
+\label{sec:ketqua_danhgia}
+
+\subsection{Đánh giá mô-đun trí tuệ nhân tạo}
+\label{subsec:danhgia_ai}
+
+Hiệu năng của các mô-đun trí tuệ nhân tạo được đánh giá định lượng trên tập dữ liệu kiểm thử độc lập gồm các ảnh món ăn thực tế và các kịch bản hồ sơ người dùng có tiền sử chấn thương đa dạng. Kết quả thu được được trình bày chi tiết tại \cref{tab:ai_eval}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Kết quả đánh giá thực nghiệm các mô-đun trí tuệ nhân tạo trong hệ thống}
+\label{tab:ai_eval}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.2cm} c c >{\raggedright\arraybackslash}X}
+    \toprule
+    \textbf{Tác vụ đánh giá} & \textbf{Mẫu thử} & \textbf{Chính xác} & \textbf{Đánh giá và nhận xét kỹ thuật} \\
+    \midrule
+    Phân loại ảnh món ăn, thiết bị và ảnh ngoài lề & 120 ảnh & 95.8\% & Bộ gác cổng thị giác từ chối chuẩn xác các ảnh không thuộc danh mục thực phẩm. \\
+    \addlinespace[4pt]
+    Nhận diện tên món ăn Việt Nam phổ biến & 100 ảnh & 91.0\% & Nhận diện tốt phở bò, cơm tấm sườn, ức gà, trứng luộc; sai lệch nhỏ ở món canh hỗn hợp. \\
+    \addlinespace[4pt]
+    Lọc bỏ bài tập chống chỉ định chấn thương & 80 hồ sơ & 100.0\% & Bộ lọc quy tắc cơ sinh học loại bỏ hoàn toàn các bài tập gây hại khớp gối, vai và lưng. \\
+    \addlinespace[4pt]
+    Tuân thủ cấu trúc giáo án bốn pha từ 4 đến 6 bài & 80 hồ sơ & 98.7\% & Toàn bộ các buổi tập đều duy trì đúng số lượng bài, không phát sinh tình trạng Junk Volume. \\
+    \bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Kiểm thử chức năng nghiệp vụ và thời gian phản hồi API}
+\label{subsec:kiemthu_hethong}
+
+Để bảo đảm tính ổn định khi vận hành thực tế, năm kịch bản kiểm thử tích hợp tự động đã được thực thi để đo lường độ trễ xử lý trung bình và tính toàn vẹn dữ liệu giao dịch trên PostgreSQL như tổng hợp tại \cref{tab:system_test}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Kết quả kiểm thử kịch bản nghiệp vụ và thời gian phản hồi trung bình}
+\label{tab:system_test}
+\begin{tabularx}{\textwidth}{c >{\raggedright\arraybackslash}X c c}
+    \toprule
+    \textbf{Mã KT} & \textbf{Nội dung kịch bản kiểm thử nghiệp vụ} & \textbf{Độ trễ TB} & \textbf{Kết quả} \\
+    \midrule
+    TC-01 & Xác thực đăng nhập, kiểm tra phiên JWT và tính BMR, TDEE & 45 ms & Đạt chuẩn \\
+    \addlinespace[3pt]
+    TC-02 & Sinh giáo án bốn pha kết hợp kiểm tra quy tắc chấn thương & 1.85 s & Đạt chuẩn \\
+    \addlinespace[3pt]
+    TC-03 & Mua gói tập, phân bổ PT tự động và luồng PT phê duyệt giáo án & 120 ms & Đạt chuẩn \\
+    \addlinespace[3pt]
+    TC-04 & Đặt lịch tập, kiểm tra 15 phút nghỉ đệm và điểm danh bằng mã QR & 85 ms & Đạt chuẩn \\
+    \addlinespace[3pt]
+    TC-05 & Tải ảnh thực phẩm, phân loại miền ảnh và bóc tách gram dinh dưỡng & 2.65 s & Đạt chuẩn \\
+    \bottomrule
+\end{tabularx}
+\end{table}
+
+Số liệu từ \cref{tab:system_test} chứng minh hệ thống đạt độ ổn định cao, thời gian xử lý cơ sở dữ liệu thuần túy luôn duy trì dưới $150\text{ ms}$, trong khi các tác vụ suy luận đa phương thức và mô hình ngôn ngữ phản hồi trong khoảng dưới $3\text{ giây}$, hoàn toàn đáp ứng tốt trải nghiệm tương tác mượt mà của người dùng cuối.

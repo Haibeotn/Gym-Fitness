@@ -1,0 +1,64 @@
+% ==============================================================================
+% PHỤ LỤC A: MÃ NGUỒN CHƯƠNG TRÌNH
+% ==============================================================================
+
+\chapter{MÃ NGUỒN CHƯƠNG TRÌNH}
+\label{app:sourcecode}
+
+\section{Liên kết kho mã nguồn}
+
+Toàn bộ mã nguồn phát triển ứng dụng, các tệp kịch bản khởi tạo cơ sở dữ liệu, tập dữ liệu huấn luyện và cấu hình mô hình trí tuệ nhân tạo của dự án được lưu trữ tại kho mã nguồn:
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Địa chỉ repository:} \url{https://github.com/Haibeotn/Gym-Fitness}
+    \item \textbf{Nhánh mã nguồn chính:} \texttt{main}
+    \item \textbf{Giấy phép phát hành:} MIT License
+\end{itemize}
+
+\section{Cấu trúc cây thư mục của dự án phần mềm}
+
+Cấu trúc tổ chức mã nguồn và tài nguyên của hệ thống được mô tả chi tiết tại \cref{lst:project_tree}:
+
+\begin{lstlisting}[language={}, caption={Sơ đồ cấu trúc cây thư mục toàn bộ dự án Fitness AI}, label={lst:project_tree}]
+du-an-lich-tap-gym-va-fitness/
+|-- fitness-ai-backend/           # Phan he may chu Express RESTful API
+|   |-- config/                   # Ket noi PostgreSQL va khoi tao co so du lieu
+|   |   |-- db.js                 # Thiet lap ket noi co so du lieu
+|   |   `-- initDb.js             # DDL tao 19 bang du lieu
+|   |-- controllers/              # Dieu phoi nghiep vu he thong
+|   |   |-- authCtrl.js           # Xac thuc va phan quyen JWT
+|   |   |-- bookingCtrl.js        # Dat lich hen va kiem tra nghi dem 15 phut
+|   |   |-- ptCtrl.js             # Phe duyet giao an va quan ly ca day
+|   |   |-- smartFoodVisionCtrl.js# Phan loai anh va goi VLM
+|   |   |-- ragChatCtrl.js        # Tro ly ao RAG tra cuu bai tap va calo
+|   |   `-- workoutCtrl.js        # Sinh giao an 4 pha an toan chan thuong
+|   |-- middleware/               # Kiem tra chu ky JWT va ma tran phan quyen
+|   |-- routes/                   # Dinh tuyen cac diem cuoi API
+|   |-- scripts/                  # Du lieu khoi tao va tap huan luyen
+|   |   |-- fitness_train_dataset.jsonl
+|   |   |-- seedEnrichedExercises.js
+|   |   `-- seedEnrichedData.js
+|   |-- services/                 # Thuat toan BMR, TDEE va goi Ollama, Gemini
+|   |   |-- aiService.js          # Bo loc co sinh hoc INJURY_RULES
+|   |   |-- llmService.js         # Giao tiep mo hinh ngon ngu
+|   |   `-- nutritionService.js   # Cong thuc Mifflin-St Jeor va chia Macros
+|   `-- server.js                 # Khoi chay may chu Node.js
+|-- fitness-ai-frontend/          # Phan he giao dien nguoi dung React Vite
+|   `-- src/
+|       |-- components/           # Cac thanh phan giao dien chuyen sau
+|       |   |-- AudioCoachBar.jsx # Huong dan tap phat am giong noi
+|       |   |-- BookingModal.jsx  # Dat lich hen kem ma QR diem danh
+|       |   |-- LiveWorkoutModal.jsx
+|       |   `-- WorkoutStudioGenerator.jsx
+|       |-- context/              # Quan ly giao dien sang toi
+|       |-- pages/                # Cac trang ung dung chinh
+|       |   |-- Dashboard.jsx     # Bang dieu khien trung tam cua Member
+|       |   |-- Onboarding.jsx    # Khao sat the trang ban dau
+|       |   |-- PtWorkspace.jsx   # Khong gian lam viec cua PT
+|       |   `-- AdminDashboard.jsx# Bang quan tri he thong
+|       `-- services/             # Giao tiep HTTP Axios
+|-- models/
+|   `-- fitness_vision_food_lora/ # Adapter LoRA tinh chinh cho Qwen2-VL-7B
+|-- Modelfile                     # Cau hinh mo hinh tro ly ao tren Ollama
+|-- Modelfile.vision              # Cau hinh mo hinh thi giac thuc pham tren Ollama
+`-- launch-db.bat                 # Tep khoi dong nhanh dich vu co so du lieu
+\end{lstlisting}

@@ -1,0 +1,54 @@
+% ==============================================================================
+% CHƯƠNG 5: ĐÁNH GIÁ VÀ KẾT LUẬN
+% ==============================================================================
+
+\chapter{ĐÁNH GIÁ VÀ KẾT LUẬN}
+\label{chap:ketluan}
+
+\section{Các kết quả đạt được}
+\label{sec:ketqua_datduoc}
+
+Sau thời gian nghiên cứu lý thuyết, phân tích thiết kế hệ thống và tiến hành lập trình thực nghiệm, đề tài \textbf{``\reporttitle''} đã hoàn thành toàn diện các mục tiêu đề ra ban đầu:
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Về mặt khoa học thể thao và dữ liệu chuyên ngành:} Đã số hóa và chuẩn hóa thành công hệ thống dữ liệu bài tập kháng lực kèm theo các quy tắc giải phẫu chống chỉ định nghiêm ngặt cho bốn vùng khớp dễ tổn thương. Đồng thời, đề tài xây dựng kho dữ liệu dinh dưỡng chi tiết cho hơn 300 món ăn phổ biến trong ẩm thực Việt Nam, tích hợp đầy đủ công thức tính năng lượng nền tảng và phân bổ dưỡng chất đa lượng theo mục tiêu cá nhân.
+    \item \textbf{Về mặt nghiên cứu và ứng dụng trí tuệ nhân tạo:} Đã kết hợp hiệu quả mô hình ngôn ngữ lớn chạy cục bộ trên máy chủ Ollama với kỹ thuật RAG nhằm loại bỏ triệt để hiện tượng sai lệch thông tin khi tư vấn y học thể thao. Ngoài ra, việc ứng dụng kỹ thuật LoRA và QLoRA để tinh chỉnh mô hình thị giác máy tính đã mang lại khả năng phân loại miền ảnh thông minh, tự động bóc tách thành phần và ước lượng khối lượng món ăn Việt Nam đạt độ chính xác trên 91\%.
+    \item \textbf{Về mặt xây dựng sản phẩm phần mềm:} Đã phát triển hoàn chỉnh nền tảng ứng dụng Web đa phân hệ trên nền tảng React 19, Node.js Express 5 và hệ quản trị cơ sở dữ liệu PostgreSQL. Hệ thống hiện thực hóa thành công ma trận phân quyền RBAC với nguyên tắc kiểm soát chuyên môn bắt buộc là quyết định của huấn luyện viên luôn có quyền ưu tiên cao hơn trí tuệ nhân tạo, đồng thời hoàn thiện luồng đặt lịch hẹn ca 60 phút có khoảng nghỉ đệm và điểm danh xác thực qua mã QR.
+    \item \textbf{Về mặt trải nghiệm người dùng:} Cung cấp giao diện trực quan, hỗ trợ chuyển đổi giao diện sáng tối, thanh điều hướng thân thiện trên điện thoại di động và tích hợp giọng nói nhân tạo hỗ trợ đếm nhịp độ chuyển động trực tiếp trong quá trình tập luyện.
+\end{enumerate}
+
+\section{Đánh giá ưu điểm và hạn chế}
+\label{sec:uunhuocdiem}
+
+\subsection{Ưu điểm nổi bật}
+\label{subsec:uudiem}
+
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Cơ chế an toàn sinh học đa tầng:} Sự kết hợp giữa bộ lọc quy tắc cơ sinh học cứng tại cơ sở dữ liệu, câu chỉ thị ràng buộc của mô hình ngôn ngữ và quyền phê duyệt trực tiếp của huấn luyện viên giúp loại trừ hoàn toàn nguy cơ học viên tập luyện sai động tác gây tổn hại xương khớp.
+    \item \textbf{Bản địa hóa sâu sắc thói quen ăn uống Việt Nam:} Không phụ thuộc vào cơ sở dữ liệu thực phẩm phương Tây, hệ thống nhận diện và tính toán dinh dưỡng chính xác cho các món ăn truyền thống của người Việt, mang lại giá trị thực tiễn cao cho người dùng trong nước.
+    \item \textbf{Kiến trúc xử lý lai linh hoạt và tiết kiệm chi phí:} Việc vận hành song song mô hình mã nguồn mở cục bộ qua Ollama và kết nối dự phòng tới dịch vụ đám mây Google Gemini API giúp hệ thống luôn hoạt động ổn định, bảo mật dữ liệu nội bộ và tối ưu hóa chi phí vận hành hạ tầng.
+\end{itemize}
+
+\subsection{Hạn chế còn tồn tại}
+\label{subsec:hanche}
+
+Bên cạnh những kết quả tích cực đã đạt được, hệ thống vẫn còn một số điểm hạn chế do giới hạn về mặt thời gian và nguồn lực thử nghiệm:
+\begin{itemize}[leftmargin=1.5cm]
+    \item Việc ước lượng khối lượng gram của thực phẩm từ ảnh chụp hai chiều đơn lẻ đôi khi còn xảy ra sai số nhất định đối với các món ăn dạng canh hỗn hợp hoặc khi góc chụp bị khuất và thiếu vật thể đối chiếu kích thước chuẩn.
+    \item Quá trình suy luận của mô hình thị giác máy tính trên phần cứng máy tính cá nhân chưa có card đồ họa chuyên dụng công suất lớn vẫn còn độ trễ nhất định, cần thêm thời gian tải trước khi trả về kết quả bóc tách dinh dưỡng hoàn chỉnh.
+    \item Quy trình thanh toán gói tập trong phiên bản hiện tại mới dừng ở mức xác thực giao dịch nội bộ và mô phỏng trừ buổi, chưa kết nối trực tiếp với các cổng thanh toán ngân hàng tự động trực tuyến.
+\end{itemize}
+
+\section{Hướng phát triển trong tương lai}
+\label{sec:huongphattrien}
+
+Để đưa hệ thống từ giai đoạn thử nghiệm học phần thành một sản phẩm thương mại hoàn chỉnh, các định hướng phát triển trọng tâm trong giai đoạn tiếp theo bao gồm:
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Tích hợp thị giác máy tính phân tích tư thế thời gian thực:} Ứng dụng các mô hình ước lượng tư thế như MediaPipe hoặc YOLO-Pose để phát hiện góc gập khớp qua camera điện thoại, tự động đếm số lần lặp và phát âm thanh cảnh báo ngay khi người tập thực hiện sai kỹ thuật.
+    \item \textbf{Nâng cấp mô hình ước lượng chiều sâu cho thực phẩm:} Áp dụng các thuật toán ước lượng bản đồ chiều sâu từ ảnh đơn để dựng lại thể tích ba chiều của đĩa thức ăn, từ đó nâng cao độ chính xác khi nội suy khối lượng gram của từng nguyên liệu.
+    \item \textbf{Hoàn thiện hệ sinh thái quản lý phòng tập thông minh:} Bổ sung chức năng đặt lịch lặp lại định kỳ hàng tuần, thuật toán chấm điểm uy tín để hạn chế tình trạng bỏ buổi tập mà không báo trước, tích hợp cổng thanh toán trực tuyến tự động và đóng gói ứng dụng di động đa nền tảng phục vụ hàng nghìn hội viên cùng lúc.
+\end{enumerate}
+
+\section{Lời kết}
+\label{sec:loiket}
+
+Học phần \course\ đã tạo tiền đề quan trọng giúp người học tiếp cận có hệ thống với quy trình nghiên cứu, xây dựng và tích hợp các công nghệ trí tuệ nhân tạo hiện đại vào giải quyết một bài toán nghiệp vụ cụ thể. Việc hoàn thành trọn vẹn đề tài \textbf{``\reporttitle''} không chỉ khẳng định tính khả thi của mô hình kết hợp giữa huấn luyện viên cá nhân và trí tuệ nhân tạo trong việc nâng cao chất lượng rèn luyện sức khỏe, mà còn rèn luyện tư duy phân tích hệ thống toàn diện, kỹ năng lập trình giải quyết vấn đề và phong cách làm việc khoa học nghiêm túc.

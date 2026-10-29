@@ -11,7 +11,8 @@ const nutritionRoutes = require('./routes/nutritionRoutes'); // IMPORT THÊM
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ limit: '15mb', extended: true }));
 
 app.get('/', (req, res) => {
     res.json({
@@ -53,6 +54,8 @@ app.use('/api/workouts', workoutLogRoutes);
 
 // Route Nhật ký dinh dưỡng & Theo dõi Macro hàng ngày (Meal & Macro Tracking)
 const mealRoutes = require('./routes/mealRoutes');
+const { smartFoodVisionHandler } = require('./controllers/smartFoodVisionCtrl');
+app.post('/api/meals/analyze-image', smartFoodVisionHandler);
 app.use('/api/meals', mealRoutes);
 
 // Route Trao đổi trực tiếp 1-1 Học viên & PT (In-App Chat)
@@ -75,9 +78,20 @@ app.use('/api/leaderboard', leaderboardRoutes);
 const paymentRoutes = require('./routes/paymentRoutes');
 app.use('/api/payments', paymentRoutes);
 
+
+
 const PORT = process.env.PORT || 3000;
+
+
+
+// === FAST MICRO-RAG & ANTI-HALLUCINATION ROUTES ===
+const { ragContextHandler, ragChatHandler, ragAdjustWorkoutHandler } = require('./controllers/ragChatCtrl');
+app.post('/api/rag-context', ragContextHandler);
+app.post('/api/rag-chat', ragChatHandler);
+app.post('/api/rag-adjust-workout', ragAdjustWorkoutHandler);
+const { visionFoodScanHandler } = require('./controllers/visionFoodScanCtrl');
+app.post('/api/vision-food-scan', visionFoodScanHandler);
 app.listen(PORT, () => {
     console.log(`🚀 Hệ thống đang bơm máu tại cổng (port) ${PORT}... Sẵn sàng luyện tập!`);
 });
 
-

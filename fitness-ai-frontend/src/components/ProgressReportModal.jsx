@@ -146,7 +146,7 @@ export default function ProgressReportModal({ isOpen, onClose, userId = null, us
                                     Official Fitness AI
                                 </span>
                             </h2>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">Xuất báo cáo thành tích chuẩn PT &amp; biểu đồ dinh dưỡng</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Xuất báo cáo chi tiết thành tích &amp; biểu đồ dinh dưỡng</p>
                         </div>
                     </div>
 

@@ -392,7 +392,7 @@ export default function WorkoutStudioGenerator({
                                 ) : (
                                     <>
                                         <Sparkles className="w-4 h-4 text-cyan-300" />
-                                        <span>{useGeminiAi ? '🤖 Gemini Tạo Giáo Án' : '⚡ Sinh Lộ Trình 4 Pha Chuẩn'}</span>
+                                        <span>{useGeminiAi ? '🤖 Tạo Giáo Án' : '⚡ Sinh Lộ Trình 4 Pha'}</span>
                                     </>
                                 )}
                             </button>
